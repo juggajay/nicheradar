@@ -10,7 +10,7 @@ import {
   getVelocityMultiplier,
   getNewTopicBonus,
   CollectedPost,
-} from '@/lib/scoring-v2';
+} from '@/lib/scoring';
 
 const SUBREDDITS = [
   { subreddit: 'technology', category: 'tech', min_score: 50 },
@@ -337,7 +337,7 @@ function estimateHeuristicSupply(topic: string, contentType: string): number {
   return Math.max(10, Math.min(100, supply));
 }
 
-// Calculate momentum with RECENCY DECAY (V2: Plateau-based)
+// Calculate momentum with RECENCY DECAY (Plateau-based)
 // Fresh posts get boosted, proven posts (still trending after 24h) are rewarded
 function calculateMomentumWithRecency(
   score: number,
@@ -348,7 +348,7 @@ function calculateMomentumWithRecency(
   const baseMomentum = Math.min(50, Math.log10(score + 1) * 25);
   const commentBonus = Math.min(25, comments / 5);
 
-  // V2: Plateau-based recency decay (imported from scoring-v2)
+  // Plateau-based recency decay
   const nowSeconds = Date.now() / 1000;
   const hoursSincePost = Math.max(0.5, (nowSeconds - createdAt) / 3600);
   const recencyMultiplier = calculateRecencyMultiplier(hoursSincePost);
@@ -601,19 +601,6 @@ export async function POST() {
       try {
         const momentum = idea.momentum || 50;
         const supply = idea.verifiedSupply ?? idea.heuristicSupply ?? 50;
-        const gap = idea.finalGap ?? idea.initialGap ?? 0;
-
-        // Determine phase
-        const phase =
-          gap >= 60 && supply < 30
-            ? 'innovation'
-            : gap >= 45 && supply < 50
-            ? 'emergence'
-            : gap >= 30
-            ? 'growth'
-            : gap >= 15
-            ? 'maturity'
-            : 'saturated';
 
         // Determine confidence (higher if we verified with YouTube)
         const isVerified = idea.verifiedSupply !== undefined;
@@ -688,7 +675,6 @@ export async function POST() {
           momentum_score: momentum,
           reddit_total_score: idea.sourcePlatform === 'reddit' ? idea.sourceScore : null,
           hn_total_score: idea.sourcePlatform === 'hackernews' ? idea.sourceScore : null,
-          // V2 cross-platform fields
           source_platforms: uniquePlatforms,
           cross_platform_count: crossPlatformCount,
         });
@@ -709,36 +695,42 @@ export async function POST() {
 
         const previousGap = existingOpp?.gap_score || null;
 
-        // V2: Apply cross-platform boost to momentum
+        // Apply cross-platform boost to momentum
         const crossPlatformMultiplier = getCrossPlatformMultiplier(crossPlatformCount);
-        const momentumV2 = Math.min(150, momentum * crossPlatformMultiplier);
+        const boostedMomentum = Math.min(150, momentum * crossPlatformMultiplier);
 
-        // V2: Calculate velocity from historical data
-        const velocityResult = await calculateVelocity(topicId, momentumV2, supabase);
+        // Calculate velocity from historical data
+        const velocityResult = await calculateVelocity(topicId, boostedMomentum, supabase);
 
-        // V2: Calculate gap score with velocity and new topic bonus
-        // Note: Full V2 gap calculation happens in youtube-check when supply is verified
-        // Here we store preliminary V2 values
+        // Calculate gap score with velocity and new topic bonus
         const velocityMultiplier = getVelocityMultiplier(velocityResult.trend);
         const newTopicBonus = getNewTopicBonus(topicData?.first_seen_at || new Date().toISOString());
-        const baseGapV2 = momentumV2 * (1 - supply / 100);
-        const gapScoreV2 = Math.round(baseGapV2 * velocityMultiplier * newTopicBonus * 10) / 10;
+        const baseGap = boostedMomentum * (1 - supply / 100);
+        const gapScore = Math.round(baseGap * velocityMultiplier * newTopicBonus * 10) / 10;
+
+        // Determine phase from gap score
+        const calculatedPhase =
+          gapScore >= 60 && supply < 30
+            ? 'innovation'
+            : gapScore >= 45 && supply < 50
+            ? 'emergence'
+            : gapScore >= 30
+            ? 'growth'
+            : gapScore >= 15
+            ? 'maturity'
+            : 'saturated';
 
         const oppData = {
           topic_id: topicId,
           keyword: idea.topic,
           category: idea.category,
-          // V1 fields (unchanged)
-          external_momentum: momentum,
+          external_momentum: boostedMomentum,
           youtube_supply: supply,
-          gap_score: gap,
-          phase,
+          gap_score: gapScore,
+          phase: calculatedPhase,
           confidence,
           sources: [idea.sourcePlatform],
           calculated_at: new Date().toISOString(),
-          // V2 fields
-          external_momentum_v2: momentumV2,
-          gap_score_v2: gapScoreV2,
           velocity_24h: velocityResult.velocity24h,
           velocity_7d: velocityResult.velocity7d,
           velocity_trend: velocityResult.trend,
@@ -748,8 +740,8 @@ export async function POST() {
         if (existingOpp) {
           await supabase.from('opportunities').update(oppData).eq('id', existingOpp.id);
           // Log velocity if score changed significantly
-          if (previousGap !== null && Math.abs(gap - previousGap) > 5) {
-            console.log(`Velocity alert: "${idea.topic}" gap changed ${previousGap} -> ${gap}`);
+          if (previousGap !== null && Math.abs(gapScore - previousGap) > 5) {
+            console.log(`Velocity alert: "${idea.topic}" gap changed ${previousGap} -> ${gapScore}`);
           }
         } else {
           await supabase.from('opportunities').insert(oppData);

@@ -72,18 +72,12 @@ export interface YouTubeSupply {
   outlier_count: number;
   top_results: TopYouTubeResult[];
   supply_score: number | null;
-  // V2 competition quality fields
+  // Competition quality fields
   top_10_videos: TopVideoData[];
-  authority_score: number | null;
-  large_channel_count_v2: number | null;
-  medium_channel_count: number | null;
-  small_channel_count_v2: number | null;
-  freshness_score: number | null;
-  videos_last_7_days: number | null;
-  videos_last_30_days: number | null;
-  videos_last_90_days: number | null;
   volume_score: number | null;
-  supply_score_v2: number | null;
+  authority_score: number | null;
+  freshness_score: number | null;
+  medium_channel_count: number | null;
   avg_views_top_10: number | null;
   max_views_top_10: number | null;
 }
@@ -123,10 +117,7 @@ export interface Opportunity {
   sources: string[];
   created_at: string;
   updated_at: string;
-  // V2 scoring fields
-  gap_score_v2: number | null;
-  external_momentum_v2: number | null;
-  youtube_supply_v2: number | null;
+  // Opportunity quality fields
   has_authority_gap: boolean;
   has_freshness_gap: boolean;
   is_underserved: boolean;

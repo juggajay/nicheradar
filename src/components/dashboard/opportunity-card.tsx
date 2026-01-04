@@ -16,7 +16,6 @@ interface OpportunityCardProps {
   opportunity: Opportunity;
   index?: number;
   topic?: Topic;
-  showV2Comparison?: boolean;
 }
 
 // Trend arrow component
@@ -45,9 +44,7 @@ export function OpportunityCard({
   opportunity,
   index = 0,
   topic,
-  showV2Comparison = false,
 }: OpportunityCardProps) {
-  const hasV2Data = opportunity.gap_score_v2 !== null;
   const isCrossPlatform = (opportunity.cross_platform_count || 1) >= 2;
   const topicIsNew = topic ? isNewTopic(topic.first_seen_at) : false;
 
@@ -78,22 +75,16 @@ export function OpportunityCard({
               <div className="flex items-center gap-4 text-sm text-slate-400">
                 <div className="flex items-center gap-1.5">
                   <TrendingUp className="h-4 w-4 text-emerald-400" />
-                  <span>
-                    Momentum:{' '}
-                    {Math.round(opportunity.external_momentum_v2 ?? opportunity.external_momentum)}
-                  </span>
+                  <span>Momentum: {Math.round(opportunity.external_momentum)}</span>
                   <TrendArrow trend={opportunity.velocity_trend} />
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Eye className="h-4 w-4 text-blue-400" />
-                  <span>
-                    Supply:{' '}
-                    {Math.round(opportunity.youtube_supply_v2 ?? opportunity.youtube_supply)}
-                  </span>
+                  <span>Supply: {Math.round(opportunity.youtube_supply)}</span>
                 </div>
               </div>
 
-              {/* V2 Opportunity Flags */}
+              {/* Opportunity Flags */}
               <div className="flex items-center gap-2 flex-wrap">
                 <SourceIcons sources={opportunity.sources || []} />
 
@@ -134,11 +125,7 @@ export function OpportunityCard({
             </div>
 
             <div className="flex flex-col items-end gap-2">
-              <GapScore
-                score={opportunity.gap_score}
-                scoreV2={opportunity.gap_score_v2}
-                showComparison={showV2Comparison && hasV2Data}
-              />
+              <GapScore score={opportunity.gap_score} />
               <WatchButton
                 opportunityId={opportunity.id}
                 initialWatched={opportunity.is_watched}

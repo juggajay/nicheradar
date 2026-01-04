@@ -1,5 +1,5 @@
 /**
- * Phase 1 Scoring Improvements - V2 Scoring Utilities
+ * Scoring Utilities
  *
  * Contains:
  * - Recency decay (plateau-based)
@@ -127,7 +127,7 @@ export function calculateFreshnessScore(videos: TopVideoData[]): number {
  * @param freshnessScore - Score from calculateFreshnessScore
  * @returns Composite score 0-100
  */
-export function calculateSupplyScoreV2(
+export function calculateSupplyScore(
   volumeScore: number,
   authorityScore: number,
   freshnessScore: number
@@ -433,22 +433,22 @@ export function getNewTopicBonus(firstSeenAt: string | Date): number {
 // ============================================
 
 /**
- * Calculate the V2 gap score with all improvements applied.
+ * Calculate the gap score with all improvements applied.
  *
- * @param momentumV2 - Momentum after recency decay and cross-platform boost
- * @param supplyScoreV2 - Composite supply score
+ * @param momentum - Momentum after recency decay and cross-platform boost
+ * @param supplyScore - Composite supply score
  * @param velocityTrend - Velocity trend direction
  * @param firstSeenAt - When the topic was first detected
  * @returns Final gap score
  */
-export function calculateGapScoreV2(
-  momentumV2: number,
-  supplyScoreV2: number,
+export function calculateGapScore(
+  momentum: number,
+  supplyScore: number,
   velocityTrend: 'accelerating' | 'stable' | 'declining' | null,
   firstSeenAt: string | Date
 ): number {
   // Base gap calculation
-  const baseGap = momentumV2 * (1 - supplyScoreV2 / 100);
+  const baseGap = momentum * (1 - supplyScore / 100);
 
   // Apply velocity multiplier
   const velocityMultiplier = getVelocityMultiplier(velocityTrend);

@@ -6,12 +6,12 @@ import {
   calculateVolumeScore,
   calculateAuthorityScore,
   calculateFreshnessScore,
-  calculateSupplyScoreV2,
+  calculateSupplyScore,
   calculateOpportunityFlags,
   calculateVelocity,
   getVelocityMultiplier,
   getNewTopicBonus,
-} from '@/lib/scoring-v2';
+} from '@/lib/scoring';
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
@@ -182,36 +182,6 @@ async function fetchYouTubeData(query: string): Promise<{
   };
 }
 
-// V1 supply score calculation (kept for backwards compatibility)
-function calculateSupplyScore(data: {
-  totalResults: number;
-  recentCount: number;
-  largeChannelCount: number;
-}): number {
-  let supply = 50;
-
-  // Total results
-  if (data.totalResults > 500000) supply = 95;
-  else if (data.totalResults > 100000) supply = 85;
-  else if (data.totalResults > 50000) supply = 70;
-  else if (data.totalResults > 10000) supply = 55;
-  else if (data.totalResults > 5000) supply = 45;
-  else if (data.totalResults > 1000) supply = 35;
-  else if (data.totalResults > 100) supply = 25;
-  else supply = 15;
-
-  // Adjust for recent activity
-  if (data.recentCount >= 5) supply += 10;
-  else if (data.recentCount >= 2) supply += 5;
-  else if (data.recentCount === 0) supply -= 10;
-
-  // Adjust for large channels dominating
-  if (data.largeChannelCount >= 5) supply += 10;
-  else if (data.largeChannelCount === 0) supply -= 10;
-
-  return Math.max(10, Math.min(100, supply));
-}
-
 export async function POST(request: NextRequest) {
   try {
     // Check for API key first
@@ -263,38 +233,18 @@ export async function POST(request: NextRequest) {
       })),
     ]);
 
-    // V1 supply score (backwards compatible)
-    const supply = calculateSupplyScore(ytData);
-
-    // V2 scoring calculations
+    // Competition quality scoring
     const volumeScore = calculateVolumeScore(ytData.totalResults);
     const authorityScore = calculateAuthorityScore(ytData.top10Videos);
     const freshnessScore = calculateFreshnessScore(ytData.top10Videos);
-    const supplyScoreV2 = calculateSupplyScoreV2(volumeScore, authorityScore, freshnessScore);
+    const supplyScore = calculateSupplyScore(volumeScore, authorityScore, freshnessScore);
 
-    // Calculate V2 channel breakdowns
-    const largeChannelCountV2 = ytData.top10Videos.filter(
-      (v) => v.channel_subs > 1_000_000
-    ).length;
+    // Channel breakdowns
     const mediumChannelCount = ytData.top10Videos.filter(
       (v) => v.channel_subs > 100_000 && v.channel_subs <= 1_000_000
     ).length;
-    const smallChannelCountV2 = ytData.top10Videos.filter(
-      (v) => v.channel_subs <= 100_000
-    ).length;
 
-    // Calculate freshness breakdowns
-    const videosLast7Days = ytData.top10Videos.filter(
-      (v) => v.days_old <= 7
-    ).length;
-    const videosLast30Days = ytData.top10Videos.filter(
-      (v) => v.days_old <= 30
-    ).length;
-    const videosLast90Days = ytData.top10Videos.filter(
-      (v) => v.days_old <= 90
-    ).length;
-
-    // Calculate demand signals
+    // Demand signals
     const avgViewsTop10 =
       ytData.top10Videos.length > 0
         ? Math.round(
@@ -313,38 +263,30 @@ export async function POST(request: NextRequest) {
         {
           topic_id: topicId,
           checked_at: new Date().toISOString(),
-          // V1 fields (unchanged)
           total_results: ytData.totalResults,
           results_last_7_days: ytData.recentCount,
           results_last_30_days: ytData.recentCount,
           large_channel_count: ytData.largeChannelCount,
           small_channel_count: ytData.smallChannelCount,
           top_results: ytData.videos,
-          supply_score: supply,
-          // V2 fields
+          supply_score: supplyScore,
           top_10_videos: ytData.top10Videos,
           volume_score: volumeScore,
           authority_score: authorityScore,
           freshness_score: freshnessScore,
-          supply_score_v2: supplyScoreV2,
-          large_channel_count_v2: largeChannelCountV2,
           medium_channel_count: mediumChannelCount,
-          small_channel_count_v2: smallChannelCountV2,
-          videos_last_7_days: videosLast7Days,
-          videos_last_30_days: videosLast30Days,
-          videos_last_90_days: videosLast90Days,
           avg_views_top_10: avgViewsTop10,
           max_views_top_10: maxViewsTop10,
         },
         { onConflict: 'topic_id' }
       );
 
-      // Update opportunity with both V1 and V2 scores
+      // Update opportunity
       if (opportunity_id) {
-        // Get current opportunity data including V2 momentum and topic first_seen_at
+        // Get current opportunity data
         const { data: opp } = await supabase
           .from('opportunities')
-          .select('external_momentum, external_momentum_v2, velocity_trend, topic_id')
+          .select('external_momentum, velocity_trend, topic_id')
           .eq('id', opportunity_id)
           .single();
 
@@ -356,51 +298,43 @@ export async function POST(request: NextRequest) {
           .single();
 
         const momentum = opp?.external_momentum || 50;
-        const momentumV2 = opp?.external_momentum_v2 || momentum;
         const velocityTrend = opp?.velocity_trend as 'accelerating' | 'stable' | 'declining' | null;
         const firstSeenAt = topic?.first_seen_at || new Date().toISOString();
 
-        // V1 gap score (unchanged)
-        const gap = Math.round(momentum * (1 - supply / 100) * 10) / 10;
-
-        // V2 gap score with velocity and new topic bonus
-        const baseGapV2 = momentumV2 * (1 - supplyScoreV2 / 100);
+        // Gap score with velocity and new topic bonus
+        const baseGap = momentum * (1 - supplyScore / 100);
         const velocityMultiplier = getVelocityMultiplier(velocityTrend);
         const newTopicBonus = getNewTopicBonus(firstSeenAt);
-        const gapScoreV2 = Math.round(baseGapV2 * velocityMultiplier * newTopicBonus * 10) / 10;
+        const gapScore = Math.round(baseGap * velocityMultiplier * newTopicBonus * 10) / 10;
 
         // Opportunity flags
         const flags = calculateOpportunityFlags(
           authorityScore,
           freshnessScore,
           ytData.totalResults,
-          momentumV2
+          momentum
         );
 
-        // V1 phase (unchanged)
+        // Determine phase from gap score
         const phase =
-          gap >= 60 && supply < 30
+          gapScore >= 60 && supplyScore < 30
             ? 'innovation'
-            : gap >= 45 && supply < 50
+            : gapScore >= 45 && supplyScore < 50
             ? 'emergence'
-            : gap >= 30
+            : gapScore >= 30
             ? 'growth'
-            : gap >= 15
+            : gapScore >= 15
             ? 'maturity'
             : 'saturated';
 
         await supabase
           .from('opportunities')
           .update({
-            // V1 fields (unchanged)
-            youtube_supply: supply,
-            gap_score: gap,
+            youtube_supply: supplyScore,
+            gap_score: gapScore,
             phase,
             confidence: 'high',
             calculated_at: new Date().toISOString(),
-            // V2 fields
-            youtube_supply_v2: supplyScoreV2,
-            gap_score_v2: gapScoreV2,
             has_authority_gap: flags.hasAuthorityGap,
             has_freshness_gap: flags.hasFreshnessGap,
             is_underserved: flags.isUnderserved,
@@ -412,8 +346,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       keyword: searchQuery,
-      supply,
-      supply_v2: supplyScoreV2,
+      supply: supplyScore,
       data: {
         total_results: ytData.totalResults,
         recent_count: ytData.recentCount,
@@ -421,16 +354,10 @@ export async function POST(request: NextRequest) {
         large_channel_count: ytData.largeChannelCount,
         small_channel_count: ytData.smallChannelCount,
         top_videos: ytData.videos.slice(0, 5),
-        // V2 data
         volume_score: volumeScore,
         authority_score: authorityScore,
         freshness_score: freshnessScore,
-        large_channel_count_v2: largeChannelCountV2,
         medium_channel_count: mediumChannelCount,
-        small_channel_count_v2: smallChannelCountV2,
-        videos_last_7_days: videosLast7Days,
-        videos_last_30_days: videosLast30Days,
-        videos_last_90_days: videosLast90Days,
         avg_views_top_10: avgViewsTop10,
         max_views_top_10: maxViewsTop10,
       },
