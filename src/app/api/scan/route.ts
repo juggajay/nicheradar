@@ -154,8 +154,10 @@ If no posts have SPECIFIC, niche-worthy topics, return: []`;
       .filter((idea) => idea.sourceIndex > 0 && idea.sourceIndex <= posts.length)
       .map((idea) => {
         const source = posts[idea.sourceIndex - 1];
+        // Clean up topic (extract product name from full titles)
+        const cleanedTopic = cleanupTopic(idea.topic);
         return {
-          topic: idea.topic,
+          topic: cleanedTopic,
           videoTitle: idea.videoTitle,
           contentType: idea.contentType as VideoIdea['contentType'],
           category: source.category,
@@ -201,12 +203,44 @@ function isGigaTopic(topic: string): boolean {
   return false;
 }
 
+// Clean up topic - extract actual product name from full titles
+function cleanupTopic(topic: string): string {
+  let cleaned = topic.trim();
+
+  // If contains colon, take only the part before it (e.g., "MyTorch: Autograd..." -> "MyTorch")
+  if (cleaned.includes(':')) {
+    const beforeColon = cleaned.split(':')[0].trim();
+    if (beforeColon.length >= 3 && beforeColon.split(/\s+/).length <= 4) {
+      cleaned = beforeColon;
+    }
+  }
+
+  // If contains dash with long text after, take before (e.g., "Jujutsu - A Git-compatible VCS" -> "Jujutsu")
+  if (cleaned.includes(' - ') || cleaned.includes(' – ')) {
+    const beforeDash = cleaned.split(/\s[-–]\s/)[0].trim();
+    if (beforeDash.length >= 3 && beforeDash.split(/\s+/).length <= 4) {
+      cleaned = beforeDash;
+    }
+  }
+
+  // Remove trailing version numbers (e.g., "React 19" -> "React 19" is ok, but "v1.0.0" patterns)
+  cleaned = cleaned.replace(/\s+v?\d+\.\d+(\.\d+)?$/i, '');
+
+  return cleaned;
+}
+
 // Validate topic quality - reject garbage
 function isValidTopic(topic: string): boolean {
   if (!topic || topic.length < 3) return false;
 
-  // Reject if too long (full sentences)
-  if (topic.split(/\s+/).length > 6) return false;
+  // Reject if too long in characters (full titles)
+  if (topic.length > 40) return false;
+
+  // Reject if too many words (should be 1-4 words)
+  if (topic.split(/\s+/).length > 4) return false;
+
+  // Reject if contains colon followed by text (full title pattern like "MyTorch: Autograd in...")
+  if (/:.{5,}/.test(topic)) return false;
 
   // Reject if ends with connector words (fragments)
   if (/\s+(for|the|and|or|to|a|an|in|on|with|of|is|are|was|were)$/i.test(topic)) return false;
@@ -226,6 +260,7 @@ function isValidTopic(topic: string): boolean {
     /^(my|your|our|their)\s+/i,
     /\.\.\./,  // Truncated titles
     /^\d+\s+/,  // Starts with number
+    /\d+\s+(lines|ways|tips|steps|things)/i, // "450 lines of", "10 ways to"
   ];
   for (const pattern of garbagePatterns) {
     if (pattern.test(topic)) return false;
