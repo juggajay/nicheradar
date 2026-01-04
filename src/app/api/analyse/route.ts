@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import {
+  calculateVolumeScore,
+  calculateSupplyScore as calculateCompositeSupply,
+  calculateGapScore as calculateGapWithBonuses,
+} from '@/lib/scoring';
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
@@ -117,21 +122,27 @@ export async function POST(request: NextRequest) {
         .limit(1)
         .single();
 
-      const { data: supply } = await supabase
+      const { data: supplyData } = await supabase
         .from('youtube_supply')
-        .select('*')
+        .select('supply_score, volume_score, authority_score, freshness_score')
         .eq('topic_id', existingTopic.id)
         .order('checked_at', { ascending: false })
         .limit(1)
         .single();
 
       const momentum = signal?.momentum_score || 30;
-      const supplyScore = calculateSupplyScore(supply);
-      const gapScore = calculateGapScore(momentum, supplyScore);
+      // Use stored v2 supply_score if available, otherwise calculate from components
+      const supplyScore = supplyData?.supply_score ??
+        (supplyData ? calculateCompositeSupply(
+          supplyData.volume_score || 50,
+          supplyData.authority_score || 50,
+          supplyData.freshness_score || 50
+        ) : 50);
+      const gapScore = calculateGapWithBonuses(momentum, supplyScore, null, existingTopic.first_seen_at || new Date());
 
       return NextResponse.json({
         keyword: existingTopic.keyword,
-        gap_score: gapScore,
+        gap_score: Math.round(gapScore * 10) / 10,
         momentum: momentum,
         supply: supplyScore,
         phase: classifyPhase(momentum, supplyScore, gapScore),
@@ -145,29 +156,21 @@ export async function POST(request: NextRequest) {
     // For new keywords, fetch real YouTube data to estimate supply
     const ytStats = await getYouTubeStats(keyword);
 
-    // Calculate supply based on YouTube data
-    let supply = 30; // Base supply for new keywords
-    if (ytStats.totalResults > 100000) supply = 80;
-    else if (ytStats.totalResults > 50000) supply = 70;
-    else if (ytStats.totalResults > 10000) supply = 60;
-    else if (ytStats.totalResults > 1000) supply = 45;
-    else if (ytStats.totalResults > 100) supply = 30;
-    else supply = 15;
-
-    // Adjust for recent activity
-    if (ytStats.recentCount >= 10) supply += 10;
-    else if (ytStats.recentCount >= 5) supply += 5;
-
-    supply = Math.min(95, supply);
+    // Calculate supply using v2 volume score (authority/freshness unknown for new keywords)
+    const volumeScore = calculateVolumeScore(ytStats.totalResults);
+    // Estimate authority (50 = unknown) and adjust freshness based on recent activity
+    const estimatedAuthority = 50;
+    const estimatedFreshness = ytStats.recentCount >= 10 ? 70 : ytStats.recentCount >= 5 ? 50 : 30;
+    const supply = calculateCompositeSupply(volumeScore, estimatedAuthority, estimatedFreshness);
 
     // Estimate momentum (low for new untracked keywords)
     const momentum = 20;
-    const gap = calculateGapScore(momentum, supply);
+    const gap = calculateGapWithBonuses(momentum, supply, null, new Date());
     const phase = classifyPhase(momentum, supply, gap);
 
     return NextResponse.json({
       keyword: keyword,
-      gap_score: gap,
+      gap_score: Math.round(gap * 10) / 10,
       momentum: momentum,
       supply: supply,
       phase: phase,
@@ -182,40 +185,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function calculateSupplyScore(youtubeData: Record<string, unknown> | null): number {
-  if (!youtubeData) return 50; // Default medium supply
-
-  let score = 0;
-  const total = (youtubeData.total_results as number) || 0;
-  const recent = (youtubeData.results_last_7_days as number) || 0;
-  const large = (youtubeData.large_channel_count as number) || 0;
-
-  // Volume
-  if (total > 100000) score += 40;
-  else if (total > 10000) score += 30;
-  else if (total > 1000) score += 20;
-  else score += 10;
-
-  // Recent velocity
-  if (recent > 50) score += 30;
-  else if (recent > 20) score += 20;
-  else if (recent > 5) score += 10;
-
-  // Large channels
-  score += Math.min(large * 10, 30);
-
-  return Math.min(score, 100);
-}
-
-function calculateGapScore(momentum: number, supply: number): number {
-  const gap = momentum * (1 - supply / 100);
-  return Math.round(gap * 10) / 10;
-}
-
 function classifyPhase(momentum: number, supply: number, gap: number): string {
-  if (gap >= 80 && supply < 20) return 'innovation';
-  if (gap >= 60 && supply < 40) return 'emergence';
-  if (gap >= 40) return 'growth';
-  if (gap >= 20) return 'maturity';
+  if (gap >= 60 && supply < 30) return 'innovation';
+  if (gap >= 45 && supply < 50) return 'emergence';
+  if (gap >= 30) return 'growth';
+  if (gap >= 15) return 'maturity';
   return 'saturated';
 }

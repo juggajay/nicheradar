@@ -729,7 +729,7 @@ export async function POST() {
           gap_score: gapScore,
           phase: calculatedPhase,
           confidence,
-          sources: [idea.sourcePlatform],
+          sources: uniquePlatforms, // All platforms where this topic appeared
           calculated_at: new Date().toISOString(),
           velocity_24h: velocityResult.velocity24h,
           velocity_7d: velocityResult.velocity7d,
