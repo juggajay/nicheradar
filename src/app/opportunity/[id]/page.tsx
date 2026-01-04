@@ -4,6 +4,7 @@ import { PhaseBadge, GapScore, SourceIcons, WatchButton } from '@/components/das
 import { TrendChart } from '@/components/charts/trend-chart';
 import { YouTubeChecker } from '@/components/opportunity/youtube-checker';
 import { SourceLinks } from '@/components/opportunity/source-links';
+import { ViralArchitectButton } from '@/components/opportunity/viral-architect-button';
 import { ArrowLeft, TrendingUp, Eye, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -124,11 +125,17 @@ export default async function OpportunityPage({ params }: PageProps) {
                     <SourceIcons sources={opportunity.sources || []} />
                   </div>
                 </div>
-                <WatchButton
-                  opportunityId={opportunity.id}
-                  initialWatched={opportunity.is_watched}
-                  variant="full"
-                />
+                <div className="flex items-center gap-2">
+                  <ViralArchitectButton
+                    topicName={opportunity.keyword}
+                    contextSummary={`${opportunity.category} topic with ${opportunity.gap_score} gap score and ${opportunity.external_momentum} momentum`}
+                  />
+                  <WatchButton
+                    opportunityId={opportunity.id}
+                    initialWatched={opportunity.is_watched}
+                    variant="full"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4 mb-6">

@@ -1,0 +1,2478 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2026-01-04",
+    "purpose": "AI Agent Training - YouTube Content Generation & Classification",
+    "total_archetypes": 14,
+    "schema_version": "unified_v1"
+  },
+  "universal_principles": {
+    "the_three_pillars": {
+      "pillar_1_curiosity_gap": {
+        "name": "The Click",
+        "description": "Title and thumbnail combination engineering an insurmountable gap between what the viewer knows and what they need to know",
+        "key_metric": "Click-Through Rate (CTR)"
+      },
+      "pillar_2_narrative_hook": {
+        "name": "The Pledge",
+        "description": "Opening moments must utilize Cold Open Payoff or Montage of Failure to establish credibility. Viewer must believe creator has already achieved the feat before narrative begins",
+        "key_metric": "First 30-Second Retention"
+      },
+      "pillar_3_mid_video_pivot": {
+        "name": "The Turn",
+        "description": "Calculated narrative shift—new obstacle, rule change, or tonal pivot—that resets viewer attention span past the 8-minute monetization threshold",
+        "key_metric": "Average View Duration (AVD)"
+      }
+    },
+    "retention_rules": {
+      "3_second_rule": "50-60% of drop-offs occur in first 3 seconds. Thumbnail promise must be delivered immediately.",
+      "8_minute_threshold": "Critical mark for mid-roll ad monetization and deeper algorithmic signaling",
+      "conclusion_preview": "Hinting at verdict in first minute increases watch completion by 15-25%",
+      "turn_cluster": "Narrative pivots cluster at 50-70% mark across all archetypes"
+    },
+    "algorithm_priorities_2025": {
+      "primary": "Average View Duration (AVD)",
+      "secondary": "Session Time",
+      "tertiary": "Viewer Satisfaction Surveys",
+      "deprecated": "Raw View Count"
+    }
+  },
+  "archetypes": {
+    "01_the_adrenaline_cut": {
+      "archetype_id": "ARCH_001",
+      "archetype_name": "The Adrenaline Cut",
+      "alternate_names": ["The Beast Format", "The Challenge Spectacle"],
+      "category": "Entertainment",
+      "sub_category": "Challenge/Stunt",
+      "difficulty_to_produce": "Very High",
+      "faceless_adaptability": {
+        "score": 2,
+        "max_score": 10,
+        "notes": "Requires on-camera presence, large budgets, real-world logistics. Not suitable for faceless/AI generation."
+      },
+      "top_creators": [
+        {
+          "name": "MrBeast",
+          "channel": "@MrBeast",
+          "subscribers": "350M+",
+          "role": "Primary innovator and industrializer of format"
+        },
+        {
+          "name": "Airrack",
+          "channel": "@Airrack",
+          "subscribers": "17.4M",
+          "role": "Challenge/stunt crossover specialist"
+        },
+        {
+          "name": "Ryan Trahan",
+          "channel": "@RyanTrahan",
+          "subscribers": "15M+",
+          "role": "Low-budget adventure challenge variant"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "Escalation",
+        "secondary_drivers": ["Variable Rewards", "Hedonic Treadmill"],
+        "explanation": "Stakes must rise exponentially. Linear narrative insufficient—if video begins with $10K challenge, must conclude with $100K. Variable rewards (prizes, twists, eliminations) feed anticipation loop like slot machine. Viewer watches not just to see winner but to witness chaotic variables influencing outcome."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "I [Extreme Verb] [Extreme Object/Place] for [Time Period]",
+          "alternate_formulas": [
+            "$[Low] vs $[High] [Object]!",
+            "Last To [Leave/Stop] [Location] Wins $[Prize]"
+          ],
+          "rules": [
+            "Use specific numerical precision (not 'cheap vs expensive')",
+            "Extreme contrast required (6+ orders of magnitude difference)",
+            "Object must be aspirational but relatable",
+            "Exclamation mark for energy"
+          ],
+          "examples": [
+            "I Spent 50 Hours In Solitary Confinement",
+            "$1 vs $1,000,000,000 Yacht!",
+            "Last To Leave Circle Wins $500,000",
+            "I Survived 100 Days In A Circle"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Screaming/Shocked—exaggerated reaction with wide eyes, open mouth",
+          "composition": "Creator's face (70% of frame) + Prize/danger clearly visible",
+          "color_scheme": "High saturation, high contrast (yellow/black, blue/orange)",
+          "text_overlays": "Minimal but bold—price contrast or stakes in clean sans-serif",
+          "key_elements": ["Cash piles visible", "Split-screen showing contrast", "Leading lines/arrows to expensive item"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:05",
+            "action": "The Cold Open Payoff",
+            "instruction": "Show the climax immediately (explosion, cash, winner screaming) to prove payoff exists",
+            "example_script": "[DRONE SHOT of $1M yacht] 'I rented a million-dollar-a-night yacht!'",
+            "purpose": "Eliminate skepticism, establish immediate trust"
+          },
+          {
+            "timestamp": "0:05-0:15",
+            "action": "The Rules",
+            "instruction": "Rapid-fire explanation of challenge mechanics",
+            "example_script": "'If he touches the red line, he loses everything. If she steps outside the circle, she's eliminated.'",
+            "purpose": "Set up game mechanics, create investment in outcome"
+          },
+          {
+            "timestamp": "0:15-0:30",
+            "action": "The Stakes",
+            "instruction": "State the prize and consequences clearly",
+            "example_script": "'Last one standing wins $500,000. But there's a twist none of them know about.'",
+            "purpose": "Quantify value proposition"
+          },
+          {
+            "timestamp": "0:30-0:60",
+            "action": "Immediate Action",
+            "instruction": "Challenge begins immediately. NO intro sequence or channel branding. Cover multiple milestones quickly (Crazy Progression technique)",
+            "example_script": "[MONTAGE] Day 1, Day 3, Day 7—rapid cuts showing deteriorating conditions",
+            "purpose": "Prove concept delivers, build momentum"
+          }
+        ],
+        "forbidden_elements": ["Long channel intros", "Sponsor reads before action", "Excessive setup"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 1.5,
+          "range": "1-3 seconds",
+          "description": "Hyper-fast. Zero tolerance for dead air or pauses."
+        },
+        "cuts_per_minute": "20-40",
+        "b_roll_patterns": [
+          "Drone reveals for scale/wow factor",
+          "GoPro POV shots for immersion",
+          "Reaction cam close-ups interspersed",
+          "Quick montage of features during tours",
+          "Jump cuts to remove all filler"
+        ],
+        "music_and_sound": {
+          "music_style": "Orchestral tension loops, high-energy Epidemic Sound tracks",
+          "bpm_range": "120-160 during action, drops during reveals",
+          "sound_effects": "Whoosh on every transition, hits and risers punctuating cuts, cash register sounds for money reveals",
+          "technique": "Sound effects are structural, not decorative. Silence momentarily before big reveals for contrast."
+        },
+        "visual_effects": [
+          "Large colorful subtitles ('Beast Text') for accessibility",
+          "Glows and arrows highlighting key objects",
+          "Progress indicators showing journey",
+          "Countdown timers for challenges"
+        ],
+        "retention_editing_rules": [
+          "Pattern interrupt every 30-60 seconds",
+          "On-screen text reinforcing key points",
+          "Split-screen comparisons",
+          "Never show winner until final segment"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": 50,
+        "placement_description": "Exactly at the halfway point",
+        "mechanism": "The Twist or Escalation",
+        "turn_types": [
+          {
+            "name": "Rule Change",
+            "description": "Just as viewers get comfortable, the rules change",
+            "example": "'But I didn't tell them about the surprise—if they touch the walls, they lose half their money'"
+          },
+          {
+            "name": "Celebrity Surprise",
+            "description": "Unexpected cameo broadens reach to new audiences",
+            "example": "Famous YouTuber or athlete joins halfway through"
+          },
+          {
+            "name": "Stakes Doubling",
+            "description": "Prize or consequences suddenly increase",
+            "example": "'The prize just went from $100K to $500K'"
+          },
+          {
+            "name": "Elimination Twist",
+            "description": "Eliminated players get second chance or return",
+            "example": "'Everyone you voted out is coming back'"
+          }
+        ],
+        "tension_mechanics": "Investment in specific contestants; winner uncertainty until end; physical/emotional stakes visible on screen"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "15-25",
+        "target_demographics": ["Gen Z", "Gen Alpha"],
+        "ctr_drivers": ["Shock thumbnails", "Clear stakes"],
+        "avd_drivers": ["Relentless pacing", "Turn at 50%"],
+        "shareability": "Very High—spectacle nature drives social sharing"
+      }
+    },
+
+    "02_the_survival_gauntlet": {
+      "archetype_id": "ARCH_002",
+      "archetype_name": "The Survival Gauntlet",
+      "alternate_names": ["Last To Leave", "Endurance Challenge", "The Elimination"],
+      "category": "Entertainment",
+      "sub_category": "Endurance/Reality",
+      "difficulty_to_produce": "Very High",
+      "faceless_adaptability": {
+        "score": 1,
+        "max_score": 10,
+        "notes": "Requires real contestants, physical challenges, extended filming. Impossible to create without human participants."
+      },
+      "top_creators": [
+        {
+          "name": "MrBeast",
+          "channel": "@MrBeast",
+          "subscribers": "350M+",
+          "role": "Created 'Last to Leave' format"
+        },
+        {
+          "name": "Yes Theory",
+          "channel": "@YesTheory",
+          "subscribers": "10M+",
+          "role": "Adventure/challenge hybrid"
+        },
+        {
+          "name": "Sidemen",
+          "channel": "@Sidemen",
+          "subscribers": "21M+",
+          "role": "UK-based group challenge competitions"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "Elimination Drama",
+        "secondary_drivers": ["Tribal Identification", "Underdog Investment"],
+        "explanation": "Combines reality TV elimination drama with YouTube creator personality. Viewers pick favorites and root for their survival. Investment deepens as field narrows. The 'who will win?' mystery drives full watch completion."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "Last To [Leave/Stop] [Location/Action] Wins $[Prize]",
+          "alternate_formulas": [
+            "I [Survived/Lived] [Time Period] In [Extreme Condition]",
+            "[Number] Strangers Compete for $[Prize]"
+          ],
+          "rules": [
+            "Clear stakes in title (prize amount or survival duration)",
+            "Location or condition must sound difficult/extreme",
+            "Time period creates quantifiable challenge"
+          ],
+          "examples": [
+            "Last To Leave Circle Wins $500,000",
+            "I Survived 100 Days In A Circle",
+            "I Spent 50 Hours Buried Alive",
+            "100 Players Compete for $1,000,000"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Exhaustion, determination, struggle—authentic emotional state",
+          "composition": "Subject clearly in challenge environment (person in circle, in box, extreme location)",
+          "color_scheme": "Darker/more dramatic than comparison videos; spotlight on subject against dark background",
+          "text_overlays": "Time stamp ('DAY 50'), prize amount ('$500,000'), or countdown element",
+          "key_elements": ["Cash piles visible", "Countdown clocks", "Deteriorating conditions shown", "Multiple contestants visible"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:05",
+            "action": "WOW FACTOR Moment",
+            "instruction": "Spectacular visual establishing production scale",
+            "example_script": "[CRANE SHOT] House being lowered into position by crane",
+            "purpose": "Establish 'who else on YouTube can do this?'"
+          },
+          {
+            "timestamp": "0:05-0:15",
+            "action": "State Rules Clearly",
+            "instruction": "Simple, clear game mechanics",
+            "example_script": "'If you can stay in this circle for 100 days, you win $500,000. Step outside, you're eliminated.'",
+            "purpose": "Set up stakes and rules"
+          },
+          {
+            "timestamp": "0:15-0:25",
+            "action": "Quick Contestant Intros",
+            "instruction": "Flash names and brief personality hints",
+            "example_script": "[QUICK CUTS] 'This is Marcus, a former Marine. Sarah, a single mom. Jake, who's never won anything.'",
+            "purpose": "Create emotional investment in characters"
+          },
+          {
+            "timestamp": "0:25-0:40",
+            "action": "Crazy Progression Technique",
+            "instruction": "Cover multiple days in 15 seconds—don't dwell on Day 1",
+            "example_script": "[MONTAGE] Day 1... Day 7... Day 15... conditions deteriorating",
+            "purpose": "Fast forward through setup, show stakes rising"
+          },
+          {
+            "timestamp": "0:40-0:50",
+            "action": "Failure/Struggle Montage",
+            "instruction": "Show someone quitting or breaking down",
+            "example_script": "[EMOTIONAL] 'I can't do this anymore...' [CUT TO] Someone stepping out of circle",
+            "purpose": "Prove difficulty, create sympathy"
+          },
+          {
+            "timestamp": "0:50-0:60",
+            "action": "Tease Winner Mystery",
+            "instruction": "Show silhouettes of remaining contestants, hint at drama",
+            "example_script": "'Only one person can win. And what happens next... none of them saw coming.'",
+            "purpose": "Winner NOT revealed until END—drives full watch completion"
+          }
+        ],
+        "forbidden_elements": ["Revealing winner early", "Extended Day 1 setup", "Slow character intros"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 3,
+          "range": "2-8 seconds (variable)",
+          "description": "Variable: 2-3 second cuts during action, 5-8 second holds during emotional moments"
+        },
+        "cuts_per_minute": "15-25",
+        "b_roll_patterns": [
+          "Environmental establishing shots showing isolation/conditions",
+          "Close-ups of discomfort/struggle",
+          "Night-vision/unique perspective shots",
+          "Drone pulls revealing scale",
+          "Confessional-style interviews breaking action"
+        ],
+        "music_and_sound": {
+          "tension_music": "Dramatic during elimination/key moments",
+          "light_music": "Hopeful tones during bonding/funny moments",
+          "technique": "Silence during emotional confessionals; ambient environmental sounds (rain, wind) for immersion; clock ticking for countdown pressure"
+        },
+        "visual_effects": [
+          "Day counter on screen",
+          "Elimination countdown showing who's left",
+          "Split-screen during conflicts",
+          "Chapter markers for multi-day coverage"
+        ],
+        "retention_editing_rules": [
+          "Cliffhangers before ad breaks/chapters",
+          "Tease upcoming drama after each elimination",
+          "Never show final winner until last 2 minutes"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": 55,
+        "placement_description": "Multiple smaller turns; major turn at 50-70% mark",
+        "mechanism": "Alliance/Betrayal or Rules Change",
+        "turn_types": [
+          {
+            "name": "Alliance Betrayal",
+            "description": "Contestants team up then betray each other",
+            "example": "Two players make a secret deal, then one breaks it"
+          },
+          {
+            "name": "Rules Change",
+            "description": "New challenge introduced mid-competition",
+            "example": "'Starting now, you can steal money from other players'"
+          },
+          {
+            "name": "The Dark Moment",
+            "description": "Someone almost gives up, emotional breakdown",
+            "example": "Front-runner has mental breakdown, considers quitting"
+          },
+          {
+            "name": "Underdog Rise",
+            "description": "Person expected to fail starts winning",
+            "example": "Weakest-looking contestant becomes dominant"
+          }
+        ],
+        "tension_mechanics": "Investment in specific contestants; physical/emotional stakes visible; escalating difficulty over time"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "25-45",
+        "target_demographics": ["Gen Z", "Millennials"],
+        "ctr_drivers": ["Prize visibility", "Extreme conditions"],
+        "avd_drivers": ["Character investment", "Winner mystery"],
+        "shareability": "High—elimination moments drive social discussion"
+      }
+    },
+
+    "03_the_fortune_file": {
+      "archetype_id": "ARCH_003",
+      "archetype_name": "The Fortune File",
+      "alternate_names": ["The Rise and Fall Documentary", "The Industrial Documentary", "The Corporate Autopsy"],
+      "category": "Education/Commentary",
+      "sub_category": "Business Documentary",
+      "difficulty_to_produce": "Medium",
+      "faceless_adaptability": {
+        "score": 9,
+        "max_score": 10,
+        "notes": "Excellent for faceless channels. Requires voiceover, stock footage, motion graphics. No on-camera presence needed. Perfect for AI-assisted production."
+      },
+      "top_creators": [
+        {
+          "name": "MagnatesMedia",
+          "channel": "@MagnatesMedia",
+          "subscribers": "3M+",
+          "role": "Pioneer of cinematic business documentary format"
+        },
+        {
+          "name": "Moon",
+          "channel": "@MoonChannel",
+          "subscribers": "2M+",
+          "role": "Corporate horror storytelling"
+        },
+        {
+          "name": "SunnyV2",
+          "channel": "@SunnyV2",
+          "subscribers": "4M+",
+          "role": "YouTuber/influencer downfall specialist"
+        },
+        {
+          "name": "Company Man",
+          "channel": "@CompanyMan",
+          "subscribers": "1.5M+",
+          "role": "Accessible business case studies"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "Schadenfreude",
+        "secondary_drivers": ["Revelation", "Hubris Recognition"],
+        "explanation": "Pleasure derived from witnessing the fall of titans. Narrative follows Rise and Fall arc—viewers compelled by 'How did they lose it all?' This taps into deep human curiosity about hubris and failure. Information asymmetry (the 'secret' reason) keeps viewers engaged as they gain privileged knowledge."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "The [Adjective] [Rise and Fall/Downfall/Collapse] of [Entity]",
+          "alternate_formulas": [
+            "How [Entity] Lost Everything",
+            "The [Adjective] Story of [Entity]",
+            "[Entity]: From $[High] to $[Low]"
+          ],
+          "rules": [
+            "Name recognition essential for searchability",
+            "Year range adds credibility and scope",
+            "Adjectives like 'Tragic', 'Impossible', 'Bizarre' add emotional hook",
+            "Numbers (revenue, valuation, year range) add specificity"
+          ],
+          "examples": [
+            "The Tragic Downfall of Blockbuster",
+            "How WeWork Lost $47 Billion",
+            "The Rise and Fall of Toys R Us (1948-2018)",
+            "The Impossible Collapse of FTX"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "CEO/founder looking defeated, shocked, or 'caught'",
+          "composition": "Monochrome CEO portrait + Destroyed/cracked logo + Downward graph",
+          "color_scheme": "Desaturated with red/orange warning accents; heavy vignette",
+          "text_overlays": "Bold Impact or Bebas-style font with year ranges; downward arrows",
+          "key_elements": ["Before/after timeline design", "Glowing red eyes effect (villain coding)", "Numbers prominently displayed"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:10",
+            "action": "The End State Reveal",
+            "instruction": "Show the devastating outcome FIRST (bankruptcy, jail, death, empty stores)",
+            "example_script": "[SLOW PAN across empty warehouse] 'It was supposed to be the future of retail. Worth $47 billion. Today, it's worth nothing.'",
+            "purpose": "Establish tragic endpoint, create contrast"
+          },
+          {
+            "timestamp": "0:10-0:25",
+            "action": "The Golden Age Contrast",
+            "instruction": "Rapid montage of entity at peak—news clips praising them, stock soaring, celebrations",
+            "example_script": "[NEWS CLIPS] 'Revolutionary!' 'The next Amazon!' [STOCK CHART rising] [CHAMPAGNE popping]",
+            "purpose": "Show what was lost, maximize fall distance"
+          },
+          {
+            "timestamp": "0:25-0:40",
+            "action": "The Thesis Question",
+            "instruction": "Explicitly state the central mystery",
+            "example_script": "'So how did a company with $47 billion in funding... lose it all in just 18 months?'",
+            "purpose": "Frame the narrative question that drives watch time"
+          },
+          {
+            "timestamp": "0:40-0:60",
+            "action": "Chapter 1 Transition",
+            "instruction": "Kinetic title card with sound design. Signal documentary structure.",
+            "example_script": "[BASS DROP] [TEXT SLAMS ON SCREEN] 'PART ONE: THE VISION' [Dramatic score begins]",
+            "purpose": "Establish premium production value, set expectations"
+          }
+        ],
+        "forbidden_elements": ["Starting with founding story", "Slow chronological build", "Talking head opening"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 4,
+          "range": "3-8 seconds",
+          "description": "Medium-slow, audio-driven. Cuts occur on the beat of dramatic scores."
+        },
+        "cuts_per_minute": "10-15",
+        "b_roll_patterns": [
+          "100% B-roll—no talking head",
+          "Stock footage with heavy grading",
+          "Newspaper clippings with highlighted text",
+          "2.5D Parallax effect on archival photos",
+          "Kinetic typography for key statistics",
+          "Court documents and legal filings"
+        ],
+        "music_and_sound": {
+          "music_style": "Hans Zimmer-style dramatic tension, slow synthwave, deep bass rumbles",
+          "technique": "Music stops completely before major revelations for impact",
+          "sound_effects": "Bass drops on statistics, metallic hits on text slams, room tone for tension"
+        },
+        "visual_effects": [
+          "Film burns and light leaks (vintage aesthetic)",
+          "Heavy vignettes focusing viewer attention",
+          "Ken Burns 3.0 (2.5D parallax on photos)",
+          "Animated graphs and timelines",
+          "Glowing/pulsing text for key numbers"
+        ],
+        "retention_editing_rules": [
+          "Chapter markers every 5-8 minutes",
+          "Recap key points before new chapters",
+          "Foreshadow upcoming revelations"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": 60,
+        "placement_description": "Around the 60% mark",
+        "mechanism": "The Fatal Flaw Reveal",
+        "turn_types": [
+          {
+            "name": "The Fatal Flaw",
+            "description": "Music stops. Narrator reveals the specific decision/event that doomed the entity.",
+            "example": "'But they didn't account for one thing...' [SILENCE] '...the numbers were fake.'"
+          },
+          {
+            "name": "The Whistleblower",
+            "description": "Introduction of person who exposed the truth",
+            "example": "'Then, one employee decided to speak up...'"
+          },
+          {
+            "name": "The Pattern",
+            "description": "Revealing that warning signs were always there",
+            "example": "'Looking back, every disaster was predicted. They just didn't listen.'"
+          }
+        ],
+        "tension_mechanics": "Build respect/awe for entity in first half; systematically dismantle in second half; regular 'But things were about to change...' transitions"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "20-40",
+        "target_demographics": ["Millennials", "Gen X", "Business-interested"],
+        "ctr_drivers": ["Name recognition", "Destruction imagery"],
+        "avd_drivers": ["Mystery structure", "Chapter breaks"],
+        "shareability": "High—business cautionary tales get shared in professional networks"
+      }
+    },
+
+    "04_the_visual_anchor_documentary": {
+      "archetype_id": "ARCH_004",
+      "archetype_name": "The Visual Anchor Documentary",
+      "alternate_names": ["The Investigative Journey", "The Geographic Essay", "The Johnny Harris Format"],
+      "category": "Education/Journalism",
+      "sub_category": "Investigative Documentary",
+      "difficulty_to_produce": "High",
+      "faceless_adaptability": {
+        "score": 5,
+        "max_score": 10,
+        "notes": "Traditionally requires on-location footage and host presence. Can be adapted with stock footage and maps, but loses authenticity. Hybrid approach possible with AI voiceover + licensed footage."
+      },
+      "top_creators": [
+        {
+          "name": "Johnny Harris",
+          "channel": "@johnnyharris",
+          "subscribers": "6.9M",
+          "role": "Pioneer of 'visual anchor' technique"
+        },
+        {
+          "name": "Wendover Productions",
+          "channel": "@Wendoverproductions",
+          "subscribers": "4.8M",
+          "role": "Systems/logistics explainers"
+        },
+        {
+          "name": "PolyMatter",
+          "channel": "@PolyMatter",
+          "subscribers": "2.5M",
+          "role": "Geopolitical analysis with clean motion graphics"
+        },
+        {
+          "name": "RealLifeLore",
+          "channel": "@RealLifeLore",
+          "subscribers": "8M+",
+          "role": "Geographic/geopolitical analysis"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "Insider Knowledge",
+        "secondary_drivers": ["Personal Journey Investment", "Visual Evidence Trust"],
+        "explanation": "Physical travel = credibility. 'I went there' creates trust that armchair analysis cannot. The visual anchor technique (show visuals FIRST, context SECOND) reverses traditional journalism, creating immediate engagement before explanation. Viewers feel they're getting ground truth."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "Why [Country/System] is [Provocative Adjective]",
+          "alternate_formulas": [
+            "The [Hidden/Secret] Reason [Thing] Exists",
+            "How [Entity] Actually Works",
+            "I Went to [Location] to Find Out the Truth"
+          ],
+          "rules": [
+            "Bold claims about systems/institutions",
+            "Implies insider knowledge viewer doesn't have",
+            "Geographic/political specificity adds credibility"
+          ],
+          "examples": [
+            "Why Russia is Invading Ukraine",
+            "The Secret Map of US Gangs",
+            "How Budget Airlines Actually Make Money",
+            "I Traveled to the Most Isolated Country on Earth"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Host often not shown OR shown on-location in dramatic setting",
+          "composition": "Maps, geographic elements, national flags; documentary-style graphics; layered images",
+          "color_scheme": "Retro/vintage textures; sepia tones with pops of saturated color",
+          "text_overlays": "Question or provocative statement overlaid on map/location",
+          "key_elements": ["Film burns", "Light leaks", "Grain overlays", "Evidence board aesthetic"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:05",
+            "action": "In Medias Res—Dramatic Visual Anchor",
+            "instruction": "Jump straight into dramatic on-location footage or compelling visual",
+            "example_script": "[ON-LOCATION FOOTAGE] 'This is the most militarized border on Earth. And I'm standing right on it.'",
+            "purpose": "Immediate high-impact imagery within first 5 seconds"
+          },
+          {
+            "timestamp": "0:05-0:15",
+            "action": "Look At This Thing Technique",
+            "instruction": "Point camera at compelling visual evidence. Show before explaining.",
+            "example_script": "'You can see it right here—' [POINTS AT MAP/OBJECT] '—this line is where everything changed.'",
+            "purpose": "Visual anchor creates curiosity gap"
+          },
+          {
+            "timestamp": "0:15-0:30",
+            "action": "Personal Stakes/Journey Setup",
+            "instruction": "Establish physical investment in the story",
+            "example_script": "'I traveled 3,000 miles to find out the truth about what happened here.'",
+            "purpose": "Physical travel = credibility"
+          },
+          {
+            "timestamp": "0:30-0:45",
+            "action": "Promise With Tension",
+            "instruction": "Create anticipation for revelation that contradicts common belief",
+            "example_script": "'What I discovered challenges everything you've been told about this conflict.'",
+            "purpose": "Promise valuable contrarian insight"
+          },
+          {
+            "timestamp": "0:45-0:60",
+            "action": "Three-Act Roadmap Hint",
+            "instruction": "Briefly signal the story structure without spoiling",
+            "example_script": "'The answer involves [Entity 1], [Entity 2], and a secret that goes back decades.'",
+            "purpose": "Structure preview keeps viewers oriented"
+          }
+        ],
+        "key_technique": "Visual Anchor Before Contextual Bridge—show visuals FIRST, context SECOND (opposite of traditional journalism)",
+        "forbidden_elements": ["Starting with historical context", "Talking head explanations", "Map without dramatic framing"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 5,
+          "range": "3-10 seconds",
+          "description": "Alternates visual anchors → context bridges rhythmically throughout"
+        },
+        "cuts_per_minute": "8-15",
+        "b_roll_patterns": [
+          "On-location documentary footage central to narrative",
+          "Dynamic motion graphics on maps",
+          "8-frame slide animations instead of continuous Ken Burns pan (Harris signature)",
+          "Expert interview clips as brief punctuation",
+          "Archival footage with vintage overlays"
+        ],
+        "music_and_sound": {
+          "music_style": "Atmospheric, building, documentary score",
+          "technique": "Music follows emotional arc—tension during investigation, release during revelations"
+        },
+        "visual_effects": [
+          "Film burns and Gaussian blur vignettes",
+          "Retro textures and grain",
+          "Animated map paths and highlights",
+          "Pull-quotes appearing on screen"
+        ],
+        "retention_editing_rules": [
+          "New visual anchor every 60-90 seconds",
+          "Three-act structure with clear transitions",
+          "Personal reflection moments on-location"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": 65,
+        "placement_description": "Around the 65% mark",
+        "mechanism": "The Investigative Reveal",
+        "turn_types": [
+          {
+            "name": "The Investigative Reveal",
+            "description": "Discovery that mainstream sources weren't mentioning",
+            "example": "'But then I discovered something no news outlet was reporting...'"
+          },
+          {
+            "name": "The Geographic Pivot",
+            "description": "Travel to new location reveals different perspective",
+            "example": "'Everything changed when I crossed to the other side of the border.'"
+          },
+          {
+            "name": "The Historical Context Bomb",
+            "description": "Overlooked historical element reframes entire narrative",
+            "example": "'To understand this, we have to go back to a decision made in 1947...'"
+          }
+        ],
+        "tension_mechanics": "Personal reflection on-location creates genuine stakes; 'I went there to see for myself' builds trust; visual evidence feels irrefutable"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "15-30",
+        "target_demographics": ["Millennials", "News-interested", "Educated viewers"],
+        "ctr_drivers": ["Geographic specificity", "Contrarian framing"],
+        "avd_drivers": ["Visual anchor technique", "Personal journey"],
+        "shareability": "Very High—educational content with perspective gets shared"
+      }
+    },
+
+    "05_the_fraud_hunter": {
+      "archetype_id": "ARCH_005",
+      "archetype_name": "The Fraud Hunter",
+      "alternate_names": ["The Detective", "The Scam Investigation", "The Exposé"],
+      "category": "Commentary",
+      "sub_category": "Investigative Journalism",
+      "difficulty_to_produce": "Medium-High",
+      "faceless_adaptability": {
+        "score": 7,
+        "max_score": 10,
+        "notes": "Can be done faceless with green screen avatar or pure screen recordings. Evidence-heavy format works well with voiceover. The confrontation element is harder without a real host."
+      },
+      "top_creators": [
+        {
+          "name": "Coffeezilla",
+          "channel": "@Coffeezilla",
+          "subscribers": "3.5M+",
+          "role": "Pioneer of format; crypto and influencer scam investigations"
+        },
+        {
+          "name": "Spencer Cornelia",
+          "channel": "@SpencerCornelia",
+          "subscribers": "1M+",
+          "role": "Fake guru exposés"
+        },
+        {
+          "name": "Upper Echelon",
+          "channel": "@UpperEchelon",
+          "subscribers": "800K+",
+          "role": "Gaming industry investigations"
+        },
+        {
+          "name": "Münecat",
+          "channel": "@Munecat",
+          "subscribers": "500K+",
+          "role": "Multi-level marketing and cult investigations"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "Justice",
+        "secondary_drivers": ["Vindication", "Pattern Recognition"],
+        "explanation": "Viewer participates in moral crusade against 'Bad Actor'. Narrative structured as detective story—collecting clues (receipts) leading to inevitable confrontation. Satisfies desire for vindication and truth exposure. Viewer feels they're 'in on it' before the scammer gets caught."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "I Investigated [Name/Scam] and It's Worse Than You Think",
+          "alternate_formulas": [
+            "[Name] is a Fraud. Here's the Proof.",
+            "The [Name] Scam Explained",
+            "Exposing [Name]'s Lies"
+          ],
+          "rules": [
+            "Name recognition or scam type in title",
+            "Promise of proof/evidence",
+            "'Worse than you think' implies deeper investigation"
+          ],
+          "examples": [
+            "I Investigated Logan Paul's CryptoZoo and It's Worse Than You Think",
+            "The Fake Guru Pandemic",
+            "Exposing Dan Lok: The $100M Con Man",
+            "I Bought Every Ad I Saw for 24 Hours"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Creator looking skeptical/shocked; scammer looking caught/smug",
+          "composition": "Creator vs. Scammer split; 'SCAM' stamp or lie in text bubble",
+          "color_scheme": "High contrast; red warning tones",
+          "text_overlays": "Specific lie quoted; 'EXPOSED' or 'SCAM' stamp",
+          "key_elements": ["Receipts/evidence visible", "Before/after of scammer claims vs reality"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:15",
+            "action": "The Lie",
+            "instruction": "Play clip of target making bold, false claim",
+            "example_script": "[CLIP] Scammer: 'I made $10 million last month and you can too...'",
+            "purpose": "Establish what will be disproved"
+          },
+          {
+            "timestamp": "0:15-0:30",
+            "action": "The Refutation",
+            "instruction": "Creator enters frame or voiceover immediately contradicts",
+            "example_script": "'This is [Name]. He claims [X]. But the truth is much darker. And I have the receipts.'",
+            "purpose": "Establish credibility and investigation frame"
+          },
+          {
+            "timestamp": "0:30-0:45",
+            "action": "The Stakes",
+            "instruction": "Quantify the damage—money lost, people hurt",
+            "example_script": "'Millions of dollars are missing. Hundreds of victims. And the man behind it all? He's still selling.'",
+            "purpose": "Create moral urgency"
+          },
+          {
+            "timestamp": "0:45-0:60",
+            "action": "The Roadmap",
+            "instruction": "Promise the investigation structure",
+            "example_script": "'In this video, we track the money, expose the network, and I confront the man himself.'",
+            "purpose": "Promise satisfying arc—investigation + confrontation"
+          }
+        ],
+        "forbidden_elements": ["Starting with your own opinion", "Lengthy context before the lie", "Hedging language"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 3,
+          "range": "2-6 seconds",
+          "description": "Medium-fast with heavy use of picture-in-picture reactions"
+        },
+        "cuts_per_minute": "15-25",
+        "b_roll_patterns": [
+          "Screenshots of emails, DMs, blockchain transactions (highlighted)",
+          "Screen recordings of websites and courses",
+          "Picture-in-picture creator reaction",
+          "Documents and legal filings zoomed",
+          "Virtual studio/newsroom setup"
+        ],
+        "music_and_sound": {
+          "music_style": "Noir-style jazz, suspenseful investigation music",
+          "technique": "Buzzer or record scratch sound effect when lie is caught; dramatic pause before evidence reveal",
+          "sound_effects": "8-bit sounds for comedic effect on obvious lies"
+        },
+        "visual_effects": [
+          "Red circles and arrows on evidence",
+          "Highlighted text in documents",
+          "Side-by-side comparisons",
+          "Money counter animations"
+        ],
+        "retention_editing_rules": [
+          "'Gotcha' edits—claim immediately followed by refutation",
+          "Evidence hierarchy: small lies → big lies → smoking gun",
+          "Save confrontation for final 25%"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": 75,
+        "placement_description": "Around the 75% mark",
+        "mechanism": "The Confrontation",
+        "turn_types": [
+          {
+            "name": "The Phone Call",
+            "description": "Creator finally gets scammer on the phone with evidence",
+            "example": "'So I called him. And asked about the missing money directly.'"
+          },
+          {
+            "name": "The In-Person Visit",
+            "description": "Creator shows up at scammer's location",
+            "example": "'I flew to Miami to ask him one question...'"
+          },
+          {
+            "name": "The Victim Testimony",
+            "description": "Real victims share their stories",
+            "example": "'But the real story isn't the money. It's the people he destroyed.'"
+          },
+          {
+            "name": "The Paper Trail",
+            "description": "Final piece of evidence that proves everything",
+            "example": "'And then I found this document. It changes everything.'"
+          }
+        ],
+        "tension_mechanics": "Build evidence systematically; each piece worse than the last; confrontation is the payoff the entire video builds toward"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "20-45",
+        "target_demographics": ["Millennials", "Gen Z", "Crypto/finance-interested"],
+        "ctr_drivers": ["Name recognition of scammer", "Promise of receipts"],
+        "avd_drivers": ["Evidence reveals", "Confrontation anticipation"],
+        "shareability": "Very High—exposés get shared as warnings"
+      }
+    },
+
+    "06_the_interrogation_room": {
+      "archetype_id": "ARCH_006",
+      "archetype_name": "The Interrogation Room",
+      "alternate_names": ["The Criminal Psychology Breakdown", "The True Crime Analysis", "The JCS Format"],
+      "category": "Commentary/True Crime",
+      "sub_category": "Psychological Analysis",
+      "difficulty_to_produce": "Medium",
+      "faceless_adaptability": {
+        "score": 10,
+        "max_score": 10,
+        "notes": "Perfect for faceless channels. Voiceover over public domain interrogation footage. Minimal production needs. AI voiceover works well with the clinical tone required."
+      },
+      "top_creators": [
+        {
+          "name": "JCS - Criminal Psychology",
+          "channel": "@JCS",
+          "subscribers": "Original pioneer (channel issues)",
+          "role": "Created the format entirely"
+        },
+        {
+          "name": "Matt Orchard",
+          "channel": "@MattOrchard",
+          "subscribers": "2M+",
+          "role": "Crime and Society analysis, highest production heir"
+        },
+        {
+          "name": "Coffeehouse Crime",
+          "channel": "@CoffeehouseCrime",
+          "subscribers": "1M+",
+          "role": "Cozy cafe aesthetic true crime"
+        },
+        {
+          "name": "Dreading",
+          "channel": "@Dreading",
+          "subscribers": "1M+",
+          "role": "JCS-style analysis"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "The Truth Impulse",
+        "secondary_drivers": ["Expert Observer Position", "Pattern Decoding"],
+        "explanation": "Viewer placed in position of expert observer decoding 'Hidden Language' of human behavior. By explaining why a suspect touched their face or shifted in their chair, creator gives viewer sense of psychological insight. Satisfies human desire to spot liars and understand manipulation mechanics."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "What [Behavior] Looks Like",
+          "alternate_formulas": [
+            "The Case of [Name]",
+            "The Interrogation of [Name]",
+            "[Name]: A Complete Breakdown"
+          ],
+          "rules": [
+            "Name of subject in title for searchability",
+            "Behavioral framing creates educational value proposition",
+            "Simple, direct language"
+          ],
+          "examples": [
+            "What Pretending to be Crazy Looks Like",
+            "The Case of Chris Watts",
+            "The Interrogation that Shocked Detectives",
+            "When the Killer's Story Falls Apart"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Mugshot or interrogation room screenshot—distressed or smug suspect",
+          "composition": "Close-up of suspect's face; split showing 'mask slipping' between calm and distressed",
+          "color_scheme": "Desaturated, blue/grey tones (clinical, cold)",
+          "text_overlays": "Minimal—suspect's name or specific behavioral tell",
+          "key_elements": ["Red circles pointing to body language cues", "Interrogation room visible", "Before/after of suspect demeanor"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:20",
+            "action": "The Tell",
+            "instruction": "Cold open on clip of suspect saying something odd or behaving strangely",
+            "example_script": "[INTERROGATION CLIP] Suspect: [Strange statement or laugh] [FREEZE FRAME]",
+            "purpose": "Immediate hook with highest-tension moment or weirdest behavior"
+          },
+          {
+            "timestamp": "0:20-0:40",
+            "action": "The Context",
+            "instruction": "Dry, monotone narrator establishes crime and suspect",
+            "example_script": "'This is [Name]. He has just been arrested for [Crime]. He believes he's smarter than the detectives. He's wrong.'",
+            "purpose": "Ground viewer in facts, establish clinical tone"
+          },
+          {
+            "timestamp": "0:40-0:60",
+            "action": "The Thesis",
+            "instruction": "Signal what the viewer should watch for",
+            "example_script": "'Watch closely how his story falls apart the moment the detective introduces [Evidence/Tactic]. Pay attention to his hands.'",
+            "purpose": "Give viewer framework—they now feel like an expert watching"
+          }
+        ],
+        "key_technique": "'Watch carefully. In the next few seconds, [Name] is going to make a critical mistake—one that trained interrogators are specifically watching for...'",
+        "forbidden_elements": ["Sensationalizing the crime", "Emotional narration", "Rushed context"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 15,
+          "range": "5-60 seconds",
+          "description": "Slow—long takes of interrogation footage allowed to breathe. Sped up during mundane sections, slowed for key moments."
+        },
+        "cuts_per_minute": "2-8",
+        "b_roll_patterns": [
+          "Raw interrogation footage as primary content",
+          "Freeze frames with red circles on body language cues",
+          "Tactical text overlays identifying techniques ('The Reid Technique', 'Minimization')",
+          "Occasional room layout diagrams",
+          "Minimal additional B-roll—footage speaks for itself"
+        ],
+        "music_and_sound": {
+          "music_style": "Dark ambient, low drones, subtle tension builders",
+          "technique": "Silence used heavily—often long periods with only room tone; music only for transitions or builds",
+          "audio_fidelity": "Background hum preserved for immersion"
+        },
+        "voiceover_style": "Dry, monotone, clinical delivery—'Voice of God' style (think Werner Herzog)",
+        "visual_effects": [
+          "Red circles/arrows on body language",
+          "Text overlays of interrogation tactics",
+          "Timestamp indicators",
+          "Slow motion on key moments"
+        ],
+        "retention_editing_rules": [
+          "'Pause and Analyze' mechanic—play clip, pause, dissect",
+          "Regular 'pay attention here' prompts",
+          "Build tension through annotation of interrogator tactics"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": 80,
+        "placement_description": "Late—around the 80% mark",
+        "mechanism": "The Breakdown/Confession",
+        "turn_types": [
+          {
+            "name": "The Facade Break",
+            "description": "Moment suspect's mask slips—confession, caught in lie, psychological disintegration",
+            "example": "'And here it is. The moment he realizes they know everything.'"
+          },
+          {
+            "name": "The Tactic Success",
+            "description": "Interrogator's strategy finally works after hours of pressure",
+            "example": "'The detective has been building to this for three hours. Watch what happens when he plays the tape.'"
+          },
+          {
+            "name": "The Evidence Reveal",
+            "description": "Smoking gun evidence introduced that suspect didn't know existed",
+            "example": "'But the detective has been holding something back. DNA from the scene.'"
+          }
+        ],
+        "tension_mechanics": "Build-up through detailed annotation of interrogator tactics; payoff when tactics succeed; viewer feels they 'called it' because they were watching the tells"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "30-90",
+        "target_demographics": ["True crime enthusiasts", "Psychology-interested", "25-45 age range"],
+        "ctr_drivers": ["Case recognition", "Behavioral hook"],
+        "avd_drivers": ["Long-form deep dive", "Analytical engagement"],
+        "shareability": "Medium—niche but dedicated audience shares within communities",
+        "note": "Long-form dominates; algorithm rewards watch time heavily in this niche"
+      }
+    },
+
+    "07_the_curiosity_gap_mystery": {
+      "archetype_id": "ARCH_007",
+      "archetype_name": "The Curiosity Gap Mystery",
+      "alternate_names": ["The Science Explainer", "The Veritasium Format", "The Educational Hook"],
+      "category": "Education",
+      "sub_category": "Science/Explainer",
+      "difficulty_to_produce": "Medium-High",
+      "faceless_adaptability": {
+        "score": 8,
+        "max_score": 10,
+        "notes": "Works well faceless with strong motion graphics and voiceover. Requires high-quality animation/visualization capabilities. Derek Muller style requires on-camera, but Mark Rober experiments can be adapted."
+      },
+      "top_creators": [
+        {
+          "name": "Veritasium",
+          "channel": "@veritasium",
+          "subscribers": "18M+",
+          "role": "Pioneer of 'clickbait but educational' approach"
+        },
+        {
+          "name": "SmarterEveryDay",
+          "channel": "@smartereveryday",
+          "subscribers": "11M+",
+          "role": "Demonstration-based science mysteries"
+        },
+        {
+          "name": "Mark Rober",
+          "channel": "@MarkRober",
+          "subscribers": "27M+",
+          "role": "Engineering experiments with viral hooks"
+        },
+        {
+          "name": "Kurzgesagt",
+          "channel": "@kurzgesagt",
+          "subscribers": "23M+",
+          "role": "Animation-based existential science"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "The Knowledge Gap",
+        "secondary_drivers": ["Misconception Correction", "Aha Moment Anticipation"],
+        "explanation": "Treats complex topics like detective stories. Opens with counterintuitive hook, creates knowledge gap (you don't know what you don't know), then delivers satisfying 'aha' revelation. Viewer feels smarter after watching. PhD-backed approach exposes flawed assumptions, creating emotional investment in correct answer."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "[Counterintuitive Hook] + [Accessible Framing]",
+          "alternate_formulas": [
+            "The [Superlative] [Topic] No One Can [Solve/Understand]",
+            "Why [Common Belief] is Wrong",
+            "This [Simple Thing] is Actually [Mind-Blowing Fact]"
+          ],
+          "rules": [
+            "Avoid technical jargon (e.g., 'Magnus Effect' becomes 'Backspin Basketball')",
+            "Use superlatives strategically: 'Most', 'Biggest', 'Only'",
+            "35% CTR increase when using selective ALL CAPS words"
+          ],
+          "examples": [
+            "The Simplest Math Problem No One Can Solve",
+            "The Trillion Dollar Equation",
+            "How Gravity Actually Works",
+            "Most People Don't Know How Bikes Work"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Curious/intrigued—eyebrow raised, slight open mouth; discovery moment",
+          "composition": "Scientific diagram integrated with dramatic imagery; something visually unexpected demanding explanation",
+          "color_scheme": "BOGY scheme (Blue, Orange, Green, Yellow)—high contrast colors that stop scrolls",
+          "text_overlays": "Minimal (1-3 words max), bold sans-serif; question marks",
+          "key_elements": ["Mystery visual element", "Red circles/arrows pointing at key element", "Face with expression outperforms faceless"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:05",
+            "action": "Pattern Interrupt",
+            "instruction": "Visual surprise or shocking statement that contradicts common belief",
+            "example_script": "'This is the most contaminated river in America...' [DRAMATIC SHOT]",
+            "purpose": "50-60% of drop-offs occur in first 3 seconds—must arrest attention"
+          },
+          {
+            "timestamp": "0:05-0:15",
+            "action": "Knowledge Gap Creation",
+            "instruction": "Reveal the mystery—something viewer didn't know they didn't know",
+            "example_script": "'...and scientists couldn't figure out why until they discovered something hiding in plain sight.'",
+            "purpose": "Create curiosity that demands resolution"
+          },
+          {
+            "timestamp": "0:15-0:30",
+            "action": "Stakes Establishment",
+            "instruction": "Why this matters to the viewer personally",
+            "example_script": "'What they found has implications for every person watching this video.'",
+            "purpose": "Personal relevance = retention"
+          },
+          {
+            "timestamp": "0:30-0:45",
+            "action": "Credibility Establishment",
+            "instruction": "Signal expertise and research depth",
+            "example_script": "'I spoke to three Nobel laureates and spent six months investigating...'",
+            "purpose": "Authority signals justify watch time investment"
+          },
+          {
+            "timestamp": "0:45-0:60",
+            "action": "Promise Delivery",
+            "instruction": "Explicit roadmap of value",
+            "example_script": "'By the end of this video, you'll understand something about physics that changes how you see the world.'",
+            "purpose": "Clear value proposition"
+          }
+        ],
+        "key_technique": "Treat science like a detective story—introduce puzzle, walk through wrong assumptions, then reveal 'aha' moment that feels earned",
+        "forbidden_elements": ["Starting with 'Today I'm going to explain...'", "Textbook structure", "Jargon in first minute"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 6,
+          "range": "5-10 seconds",
+          "description": "Scene changes every 5-8 seconds during explanation segments"
+        },
+        "cuts_per_minute": "8-12",
+        "b_roll_patterns": [
+          "Data visualizations appearing within first 20 seconds",
+          "Mix of real-world demonstrations with motion graphics",
+          "Expert interviews intercut with demonstrations",
+          "Historical footage and diagrams",
+          "Custom animations for complex concepts"
+        ],
+        "music_and_sound": {
+          "music_style": "Subtle tension building underneath narration",
+          "technique": "Music swells during revelation moments; quieter during complex explanations"
+        },
+        "animation_usage": "Heavy—essential for visualizing invisible concepts; data viz critical for retention",
+        "visual_effects": [
+          "Animated diagrams and models",
+          "Data visualization",
+          "Split-screen comparisons",
+          "Slow-motion demonstrations"
+        ],
+        "retention_editing_rules": [
+          "Misconception → Correction cycle",
+          "Visual proof for every claim",
+          "Regular 'But here's where it gets interesting...' hooks"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": 40,
+        "placement_description": "Earlier than most archetypes—around 40%",
+        "mechanism": "The Misconception Reveal",
+        "turn_types": [
+          {
+            "name": "The Misconception Reveal",
+            "description": "Expose what viewers think they know is wrong",
+            "example": "'Everything I just told you is what scientists believed for 50 years. They were wrong.'"
+          },
+          {
+            "name": "The Expert Contradiction",
+            "description": "Mainstream view vs contrarian evidence",
+            "example": "'But when I asked Dr. [Name], she said something that changed everything...'"
+          },
+          {
+            "name": "The Demonstration Proof",
+            "description": "Visual experiment that proves the counterintuitive point",
+            "example": "'So I built this experiment to prove it. Watch what happens...'"
+          }
+        ],
+        "tension_mechanics": "Build up common belief, then systematically demolish it with evidence; viewers want to be 'in on the secret'"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "15-35",
+        "target_demographics": ["Curious adults", "STEM-interested", "25-55 age range"],
+        "ctr_drivers": ["Counterintuitive hook", "Accessible title"],
+        "avd_drivers": ["Knowledge gap resolution", "Aha moments"],
+        "shareability": "Very High—'Did you know?' content drives social sharing"
+      }
+    },
+
+    "08_the_void_gaze": {
+      "archetype_id": "ARCH_008",
+      "archetype_name": "The Void Gaze",
+      "alternate_names": ["The Internet Rabbit Hole", "The Dark Mode Essay", "The Iceberg Format"],
+      "category": "Commentary/Mystery",
+      "sub_category": "Internet Mystery/Deep Dive",
+      "difficulty_to_produce": "Medium",
+      "faceless_adaptability": {
+        "score": 10,
+        "max_score": 10,
+        "notes": "Perfect for faceless. Voiceover over custom graphics/archival footage. Campfire storytelling energy works with AI voice. Wendigoon-style is personality-driven but LEMMiNO-style is fully producible without face."
+      },
+      "top_creators": [
+        {
+          "name": "LEMMiNO",
+          "channel": "@LEMMiNO",
+          "subscribers": "6M+",
+          "role": "Polished mystery documentaries, highest production quality"
+        },
+        {
+          "name": "Wendigoon",
+          "channel": "@Wendigoon",
+          "subscribers": "4M+",
+          "role": "Iceberg chart specialist, casual 'campfire' energy"
+        },
+        {
+          "name": "Fredrik Knudsen (Down the Rabbit Hole)",
+          "channel": "@FredrikKnudsen",
+          "subscribers": "1.5M+",
+          "role": "Neutral documentary deep-dives"
+        },
+        {
+          "name": "SunnyV2",
+          "channel": "@SunnyV2",
+          "subscribers": "4M+",
+          "role": "YouTuber/internet personality deep dives"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "Immersion",
+        "secondary_drivers": ["Descent Anticipation", "Awe/Unease"],
+        "explanation": "Creates sense of being pulled into self-contained world. Faceless narration allows viewer to project themselves into mystery. Iceberg format creates 'descent'—each layer darker/stranger than last. Tone is often eerie or melancholic, triggering awe that keeps viewer watching."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "[Topic]: An Internet Mystery",
+          "alternate_formulas": [
+            "The [Adjective] [Topic] Iceberg Explained",
+            "I Spent [X Hours/Days] Investigating [Topic]",
+            "The Disturbing Truth About [Topic]"
+          ],
+          "rules": [
+            "Mystery framing essential",
+            "Personal investigation adds credibility",
+            "Iceberg format signals depth of content"
+          ],
+          "examples": [
+            "Cicada 3301: An Internet Mystery",
+            "The Conspiracy Theory Iceberg",
+            "I Investigated YouTube's Strangest Channel",
+            "The Disturbing Reality of Local 58"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Often faceless—mystery/subject-focused",
+          "composition": "Iceberg showing tiered layers OR single mysterious object against void",
+          "color_scheme": "Dark aesthetic—black backgrounds, muted colors with neon accents (green terminal text, red warnings)",
+          "text_overlays": "Question marks, '???', redacted text, glitch effects",
+          "key_elements": ["Low saturation with neon accent", "Red highlights on eyes/text", "Deep web aesthetic"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:15",
+            "action": "Mystery Establishment",
+            "instruction": "Present central enigma with atmospheric opening",
+            "example_script": "[EERIE MUSIC] 'In 2012, a puzzle appeared on the internet that would consume thousands of the world's most brilliant minds.'",
+            "purpose": "Hook with intrigue"
+          },
+          {
+            "timestamp": "0:15-0:30",
+            "action": "Personal Investment Signal",
+            "instruction": "Demonstrate research depth",
+            "example_script": "'I've spent the last six months researching this. What I found... I'm still not sure I believe.'",
+            "purpose": "Credibility through effort"
+          },
+          {
+            "timestamp": "0:30-0:45",
+            "action": "Stakes/Intrigue",
+            "instruction": "Why this matters or why it's unsettling",
+            "example_script": "'To this day, nobody knows who created it. Or why. But the theories... they get dark.'",
+            "purpose": "Create urgency"
+          },
+          {
+            "timestamp": "0:45-0:60",
+            "action": "Journey Promise",
+            "instruction": "Signal structure (especially for iceberg format)",
+            "example_script": "'We're going to go through this layer by layer. And by the end, you'll see why people are still obsessed.'",
+            "purpose": "Promise depth"
+          }
+        ],
+        "key_technique": "Eerie ambient music + mysterious imagery. 'This is the story of [Mystery].'",
+        "forbidden_elements": ["Upbeat energy", "Quick explanations", "Breaking the atmospheric tone"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 8,
+          "range": "5-30 seconds",
+          "description": "Variable—can be slow for atmosphere or faster during exposition"
+        },
+        "cuts_per_minute": "5-10",
+        "b_roll_patterns": [
+          "Custom 3D rendered scenes",
+          "Recreated interfaces and archived web pages",
+          "Forum post screenshots",
+          "Glitch effects, VHS filters for 'found footage' feel",
+          "Original source material when available"
+        ],
+        "music_and_sound": {
+          "music_style": "Ambient, atmospheric, building tension—Blade Runner vibes",
+          "technique": "Custom or royalty-free 'dark ambient'; music gets progressively darker as content descends"
+        },
+        "voiceover_styles": {
+          "style_a": "Casual 'campfire storytelling' (Wendigoon)—personality-driven, occasional humor",
+          "style_b": "Measured documentary neutrality (LEMMiNO/Fredrik Knudsen)—objective, atmospheric"
+        },
+        "visual_effects": [
+          "Fluid transitions—scenes morph into one another",
+          "Custom data visualizations",
+          "Glitch and corruption effects",
+          "Timeline and map animations"
+        ],
+        "retention_editing_rules": [
+          "Iceberg descent—each layer reveals something darker",
+          "Regular 'But here's where it gets really weird...' hooks",
+          "Acknowledge increasing strangeness"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": 70,
+        "placement_description": "Around 70% mark, or multiple mini-revelations throughout",
+        "mechanism": "The Perspective Shift",
+        "turn_types": [
+          {
+            "name": "The Descent Moment",
+            "description": "When 'normal' curiosity gives way to disturbing implications",
+            "example": "'But then I found something. And honestly? I wish I hadn't.'"
+          },
+          {
+            "name": "The Real-World Connection",
+            "description": "Internet mystery connects to actual events/people",
+            "example": "'The coordinates led to a real location. People went there. What they found...'"
+          },
+          {
+            "name": "The Perspective Shift",
+            "description": "Theory that recontextualizes everything viewer just learned",
+            "example": "'But there is another possibility. What if the puzzle was never meant to be solved?'"
+          },
+          {
+            "name": "The Unsolved Acknowledgment",
+            "description": "Admitting what remains unknown",
+            "example": "'To this day, no one knows the answer. And maybe we never will.'"
+          }
+        ],
+        "tension_mechanics": "Iceberg descent—each layer reveals something darker; regular 'But here's where it gets really weird...' hooks; acknowledge increasing strangeness"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "30-180+",
+        "target_demographics": ["Internet culture enthusiasts", "Mystery lovers", "18-35 age range"],
+        "ctr_drivers": ["Mystery framing", "Iceberg format recognition"],
+        "avd_drivers": ["Atmospheric immersion", "Depth content"],
+        "shareability": "High within niche communities",
+        "note": "Wendigoon's icebergs often 3+ hours; algorithm rewards extreme watch time"
+      }
+    },
+
+    "09_the_verdict_matrix": {
+      "archetype_id": "ARCH_009",
+      "archetype_name": "The Verdict Matrix",
+      "alternate_names": ["The Cinematic Review", "The Tech Review", "The Premium Unboxing"],
+      "category": "Tech",
+      "sub_category": "Product Review",
+      "difficulty_to_produce": "High",
+      "faceless_adaptability": {
+        "score": 6,
+        "max_score": 10,
+        "notes": "Can be done faceless with high-quality product B-roll and voiceover. Loses the 'trusted face' element but works for pure product focus. Requires expensive camera equipment for 'product porn' aesthetic."
+      },
+      "top_creators": [
+        {
+          "name": "MKBHD",
+          "channel": "@mkbhd",
+          "subscribers": "19M+",
+          "role": "Gold standard for premium tech reviews"
+        },
+        {
+          "name": "Dave2D",
+          "channel": "@Dave2D",
+          "subscribers": "4M+",
+          "role": "Design-focused minimalist reviews"
+        },
+        {
+          "name": "Mr. Mobile",
+          "channel": "@TheMrMobile",
+          "subscribers": "1.5M+",
+          "role": "Cinematic smartphone coverage"
+        },
+        {
+          "name": "Linus Tech Tips",
+          "channel": "@LinusTechTips",
+          "subscribers": "16M+",
+          "role": "High-energy deep technical reviews"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "The Authority Trust",
+        "secondary_drivers": ["Paradox Resolution", "Purchase Justification"],
+        "explanation": "Successful reviews frame product within a 'Paradox' (e.g., 'The Best Phone You Shouldn't Buy'). Cognitive dissonance hooks viewer, who watches to resolve contradiction. Creator acts as 'Trusted Authority' cutting through marketing hype. Viewer relies on parasocial relationship to make financial decisions."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "The [Product] Review: [Strong Opinion/Verdict]!",
+          "alternate_formulas": [
+            "The [Product] is [Adjective]. Here's Why.",
+            "[Product] Review: [Duration] Later...",
+            "The [Adjective] Truth About [Product]"
+          ],
+          "rules": [
+            "Product name first for searchability",
+            "Strong opinion signals value (not wishy-washy)",
+            "Testing duration adds credibility"
+          ],
+          "examples": [
+            "iPhone 16 Pro Max: 6 Months Later",
+            "The Worst Product I've Ever Reviewed",
+            "Galaxy S25 Ultra: The One to Get!",
+            "MacBook Pro M4: Don't Be Satisfied!"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Neutral/confident when shown; face appears sparingly",
+          "composition": "Single product on solid/dark background; studio lighting; high-end product photography",
+          "color_scheme": "Natural/realistic—'no overdone filters'; dark backgrounds with product as hero",
+          "text_overlays": "Minimal (1-3 words max)—sometimes just checkmark or X",
+          "key_elements": ["Clean, minimalist aesthetic", "8K quality visible", "Product as visual hero"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:15",
+            "action": "Authority Establishment",
+            "instruction": "Establish testing credibility through personal context",
+            "example_script": "'I've been using this for six weeks now. Every single day. And I have thoughts.'",
+            "purpose": "Credentials implied through testing duration"
+          },
+          {
+            "timestamp": "0:15-0:30",
+            "action": "Problem Framing",
+            "instruction": "Position as answering 'Is this worth YOUR money?'",
+            "example_script": "'There's been a lot of hype around this phone. So let's break down what it actually delivers.'",
+            "purpose": "Frame as buyer's guide"
+          },
+          {
+            "timestamp": "0:30-0:45",
+            "action": "Conclusion Preview Technique",
+            "instruction": "Hint at verdict to create narrative tension",
+            "example_script": "'Spoiler: this might be my favorite [category] yet. OR There's a catch that almost killed it for me.'",
+            "purpose": "Create commitment to finish"
+          },
+          {
+            "timestamp": "0:45-0:60",
+            "action": "Structure Preview",
+            "instruction": "Set expectations for comprehensive coverage",
+            "example_script": "'Let's break down everything you need to know. Display. Camera. Battery. And whether it's actually worth the price.'",
+            "purpose": "Clear roadmap"
+          }
+        ],
+        "key_technique": "98% scripted dialogue—written in bold; B-roll cues unbolded",
+        "forbidden_elements": ["Unboxing for its own sake", "Spec dumps without context", "Wishy-washy conclusions"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 4,
+          "range": "3-8 seconds",
+          "description": "Clean jump cuts maintaining context between takes"
+        },
+        "cuts_per_minute": "12-18",
+        "b_roll_patterns": [
+          "Product in real-world settings (outdoor shots, lifestyle contexts)",
+          "Macro detail shots showcasing build quality",
+          "J-cuts (audio leads video) for smooth transitions",
+          "Minimal on-screen specs—verbal delivery prioritized"
+        ],
+        "music_and_sound": {
+          "music_style": "Subtle, supportive background (Epidemic Sound style)",
+          "technique": "Music never competes with voiceover"
+        },
+        "production_requirements": {
+          "camera": "RED cameras (8K) or equivalent",
+          "software": "DaVinci Resolve, Final Cut Pro with MotionVFX plugins",
+          "lighting": "Professional studio lighting for product shots"
+        },
+        "visual_effects": [
+          "Clean product animations",
+          "Comparison overlays",
+          "Chapter/section graphics",
+          "Score indicators"
+        ],
+        "retention_editing_rules": [
+          "Chapter markers for navigation",
+          "Verdict clearly stated at end",
+          "Personal use context throughout"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": 85,
+        "placement_description": "Late—around the 85% mark",
+        "mechanism": "The 'BUT' Moment",
+        "turn_types": [
+          {
+            "name": "The BUT Moment",
+            "description": "Pivot from praise to criticism (or vice versa)",
+            "example": "'The hardware is perfect... BUT the software ruins it.'"
+          },
+          {
+            "name": "The Unexpected Finding",
+            "description": "Surprising test result that changes assessment",
+            "example": "'But when I tested real-world battery life, something weird happened.'"
+          },
+          {
+            "name": "The Use-Case Split",
+            "description": "Verdict depends on viewer type",
+            "example": "'If you're X type of user, yes. If you're Y, wait for next year.'"
+          }
+        ],
+        "tension_mechanics": "Build positive momentum then introduce qualification; clear final verdict with context"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "10-20",
+        "target_demographics": ["Tech enthusiasts", "Purchase researchers", "25-45 age range"],
+        "ctr_drivers": ["Product recognition", "Strong opinion signal"],
+        "avd_drivers": ["Chapter structure", "Clear verdict"],
+        "shareability": "High—linked in buying discussions",
+        "note": "Often performs as evergreen content with search traffic"
+      }
+    },
+
+    "10_the_vs_battle": {
+      "archetype_id": "ARCH_010",
+      "archetype_name": "The VS Battle",
+      "alternate_names": ["The Head-to-Head", "The Comparison Review", "The Shootout"],
+      "category": "Tech",
+      "sub_category": "Comparison",
+      "difficulty_to_produce": "Medium-High",
+      "faceless_adaptability": {
+        "score": 6,
+        "max_score": 10,
+        "notes": "Can be done faceless with split-screen product footage and voiceover. Requires owning both products and consistent test conditions. Running score graphics essential."
+      },
+      "top_creators": [
+        {
+          "name": "Mrwhosetheboss",
+          "channel": "@Mrwhosetheboss",
+          "subscribers": "21M+",
+          "role": "UK's largest tech YouTuber, comparison specialist"
+        },
+        {
+          "name": "Unbox Therapy",
+          "channel": "@UnboxTherapy",
+          "subscribers": "18M+",
+          "role": "Dramatic head-to-head battles"
+        },
+        {
+          "name": "JerryRigEverything",
+          "channel": "@JerryRigEverything",
+          "subscribers": "8M+",
+          "role": "Durability 'torture test' comparisons"
+        },
+        {
+          "name": "SuperSaf",
+          "channel": "@SuperSaf",
+          "subscribers": "4M+",
+          "role": "Camera shootout specialist"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "Tribal Validation",
+        "secondary_drivers": ["Decision Simplification", "Score Satisfaction"],
+        "explanation": "Viewers often already own one product—they watch to validate their choice or find ammunition for arguments. Addresses both 'sides' of audience while delivering clear verdict. Running score format gamifies decision-making, making abstract comparisons tangible and satisfying."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "[Product A] vs [Product B]: The TRUTH",
+          "alternate_formulas": [
+            "[Product A] vs [Product B] - Which Should You Buy?",
+            "I Switched from [A] to [B] for [Time Period]",
+            "[Product A] vs [Product B]: [Category] Shootout"
+          ],
+          "rules": [
+            "Both products named for dual-audience searchability",
+            "'The TRUTH' implies insider knowledge",
+            "Switching format adds personal credibility"
+          ],
+          "examples": [
+            "iPhone 16 Pro vs Galaxy S25 Ultra: The TRUTH",
+            "I Switched to Android After 10 Years",
+            "MacBook Pro vs Dell XPS: Which Should You Buy?",
+            "Camera Shootout: iPhone vs Pixel vs Samsung"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Host in center (optional)—pointing to preferred choice or showing surprise",
+          "composition": "Split-screen design—Product A on left, Product B on right; both at matching angles",
+          "color_scheme": "Color coding for Team A vs Team B (blue vs orange common)",
+          "text_overlays": "VS/Battle graphics, lightning bolts, winner indicators (crown, checkmark)",
+          "key_elements": ["Contrasting backgrounds", "Winner indicator on one side", "Both products equally prominent"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:15",
+            "action": "Authority Establishment",
+            "instruction": "Establish testing credibility through personal ownership",
+            "example_script": "'I've been using BOTH of these phones for the last two months. Every single day. Here's what I found.'",
+            "purpose": "Dual-ownership credibility"
+          },
+          {
+            "timestamp": "0:15-0:30",
+            "action": "Neutral Positioning",
+            "instruction": "Appeal to both audiences; reject fanboy framing",
+            "example_script": "'Everyone's debating which one is actually better. The fanboys on both sides are wrong. The truth is more nuanced.'",
+            "purpose": "Disarm tribalism, promise objectivity"
+          },
+          {
+            "timestamp": "0:30-0:45",
+            "action": "Conclusion Preview",
+            "instruction": "Build anticipation for verdict",
+            "example_script": "'By the end of this video, you'll know exactly which one to buy. And there IS a clear winner.'",
+            "purpose": "Promise decisive verdict"
+          },
+          {
+            "timestamp": "0:45-0:60",
+            "action": "Category Preview",
+            "instruction": "Signal comprehensive test structure",
+            "example_script": "'We're testing camera, display, performance, battery, and value. Let's get into it.'",
+            "purpose": "Structure preview"
+          }
+        ],
+        "key_technique": "'As someone who's tested hundreds of phones...'—establish neutrality through volume of experience",
+        "forbidden_elements": ["Taking sides early", "Mentioning personal preference before tests", "Skipping categories"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 4,
+          "range": "3-6 seconds",
+          "description": "Medium pace with clear section breaks"
+        },
+        "cuts_per_minute": "12-18",
+        "b_roll_patterns": [
+          "Side-by-side test footage—same task on both devices",
+          "Real-world tests not just benchmarks",
+          "Score/rating overlays at section conclusions",
+          "Running tally or scorecard visible"
+        ],
+        "music_and_sound": {
+          "music_style": "Energetic but not overwhelming",
+          "technique": "Music shifts to signal section changes; sound effects for score reveals"
+        },
+        "visual_effects": [
+          "Split-screen throughout",
+          "Running score counter",
+          "Category winner badges",
+          "Final verdict graphics"
+        ],
+        "category_structure": "Camera → Display → Performance → Battery → Value (with timestamps/chapters)",
+        "retention_editing_rules": [
+          "Score after each category",
+          "Running tally visible",
+          "Clear chapter markers",
+          "Final verdict last"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": "Variable",
+        "placement_description": "Often mid-video when unexpected category winner revealed",
+        "mechanism": "The Category Flip",
+        "turn_types": [
+          {
+            "name": "The Category Flip",
+            "description": "Expected winner loses a category",
+            "example": "'I was SURE the iPhone would win camera. I was wrong.'"
+          },
+          {
+            "name": "The Personal Use Revelation",
+            "description": "Creator reveals which they actually use daily",
+            "example": "'After all these tests, here's the one I've been reaching for every morning.'"
+          },
+          {
+            "name": "The Nuanced Verdict",
+            "description": "Winner depends on use case",
+            "example": "'If you care about X, get A. If you care about Y, get B. Here's why...'"
+          }
+        ],
+        "tension_mechanics": "Acknowledge both audiences; unexpected findings create discussion/comments; final verdict clear but contextualized"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "12-20",
+        "target_demographics": ["Purchase researchers", "Tech enthusiasts", "Both product fanbases"],
+        "ctr_drivers": ["Both products named", "Battle/VS framing"],
+        "avd_drivers": ["Score system", "Winner anticipation"],
+        "shareability": "Very High—shared in debates between product camps"
+      }
+    },
+
+    "11_the_proficiency_sprint": {
+      "archetype_id": "ARCH_011",
+      "archetype_name": "The Proficiency Sprint",
+      "alternate_names": ["The Zero to Hero", "The Learning Challenge", "The Skill Acquisition"],
+      "category": "Lifestyle/Education",
+      "sub_category": "Self-Improvement",
+      "difficulty_to_produce": "Medium",
+      "faceless_adaptability": {
+        "score": 3,
+        "max_score": 10,
+        "notes": "Requires human attempting and failing at skills on camera. Core appeal is watching the struggle. Very difficult to make faceless without losing authenticity."
+      },
+      "top_creators": [
+        {
+          "name": "Mike Boyd",
+          "channel": "@MikeBoyd",
+          "subscribers": "6M+",
+          "role": "Pioneer of format"
+        },
+        {
+          "name": "Mike Shake",
+          "channel": "@MikeShake",
+          "subscribers": "2M+",
+          "role": "Extended challenge variants"
+        },
+        {
+          "name": "Will Tennyson",
+          "channel": "@WillTennyson",
+          "subscribers": "4M+",
+          "role": "Fitness skill challenges"
+        },
+        {
+          "name": "Max Fosh",
+          "channel": "@MaxFosh",
+          "subscribers": "3M+",
+          "role": "Comedy skill challenges"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "The Hero's Journey",
+        "secondary_drivers": ["Vicarious Achievement", "Relatability"],
+        "explanation": "Condensed Hero's Journey. Viewer identifies with creator's initial incompetence ('The Struggle Phase'). Witnessing repeated failure builds empathy. Eventual success triggers dopamine hit—viewer experiences 'Vicarious Achievement'. Validates idea that hard work leads to mastery."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "I Learned to [Skill] in [Time Period]",
+          "alternate_formulas": [
+            "I Trained [Skill] for [Hours/Days] - Here's What Happened",
+            "Can I [Achievement] in [Time]?",
+            "[Time Period] to Learn [Skill]"
+          ],
+          "rules": [
+            "Skill must be visually demonstrable",
+            "Time constraint adds urgency",
+            "Achievement must seem difficult but not impossible"
+          ],
+          "examples": [
+            "I Learned to Solve a Rubik's Cube in 24 Hours",
+            "30 Days to Run a Sub-20 5K",
+            "Can I Play Piano in 7 Days?",
+            "I Trained Like a Navy SEAL for 30 Days"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Split: Frustrated/failing on left, triumphant/succeeding on right",
+          "composition": "Before/after split screen or chaos-to-mastery progression",
+          "color_scheme": "Contrasting—chaotic/dark on fail side, bright/clean on success side",
+          "text_overlays": "Timer graphic, day counter, skill name",
+          "key_elements": ["Timer visible", "Clear skill representation", "Transformation visible"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:15",
+            "action": "The Skill Demo",
+            "instruction": "Show a pro doing the skill perfectly—establish the goal",
+            "example_script": "[PRO FOOTAGE] 'This looks impossible.' [SLOW MOTION of complex skill]",
+            "purpose": "Show end state, create aspiration"
+          },
+          {
+            "timestamp": "0:15-0:30",
+            "action": "The Attempt",
+            "instruction": "Creator tries and fails miserably—comedic timing",
+            "example_script": "[CRASH/FAIL] 'I have no idea what I'm doing.' [FRUSTRATED REACTION]",
+            "purpose": "Establish starting point, build empathy"
+          },
+          {
+            "timestamp": "0:30-0:45",
+            "action": "The Goal/Deadline",
+            "instruction": "State the time constraint and stakes",
+            "example_script": "'I have exactly 7 days to master this. If I fail, I have to [Consequence].'",
+            "purpose": "Create urgency and stakes"
+          },
+          {
+            "timestamp": "0:45-0:60",
+            "action": "Day 1 Start",
+            "instruction": "Immediate training montage—no more setup",
+            "example_script": "[TIMER STARTS] [TRAINING MONTAGE BEGINS]",
+            "purpose": "Begin journey immediately"
+          }
+        ],
+        "key_technique": "The timer is always visible—quantitative progress creates narrative",
+        "forbidden_elements": ["Long backstory", "Excessive preamble", "Unclear skill definition"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 2,
+          "range": "1-4 seconds during montages",
+          "description": "Rhythmic—montages synced to music beats"
+        },
+        "cuts_per_minute": "20-40 during montages, 10-15 during talking",
+        "b_roll_patterns": [
+          "Multi-angle training footage",
+          "Progress comparison clips",
+          "Day markers and counters",
+          "Failure supercuts set to comedic music"
+        ],
+        "music_and_sound": {
+          "music_style": "Lo-fi hip hop for study/grind, upbeat rock for success moments",
+          "technique": "Music shifts with emotional arc—frustration, persistence, triumph"
+        },
+        "visual_effects": [
+          "Timer/stopwatch always visible",
+          "Day counter on screen",
+          "Progress bar or percentage",
+          "'Level up' graphics for milestones"
+        ],
+        "retention_editing_rules": [
+          "Failure Supercut—rapid cuts of mistakes synced to music",
+          "Progress markers at regular intervals",
+          "Valley before breakthrough"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": 65,
+        "placement_description": "Around 65% mark—the 'Valley of Despair'",
+        "mechanism": "The Breakthrough",
+        "turn_types": [
+          {
+            "name": "The Plateau",
+            "description": "Progress stops; creator considers giving up",
+            "example": "'Day 4. I'm not getting any better. I don't know if I can do this.'"
+          },
+          {
+            "name": "The Technique Discovery",
+            "description": "Creator finds 'secret' technique that unlocks progress",
+            "example": "'Then I found this one tip that changed everything...'"
+          },
+          {
+            "name": "The Breakthrough Moment",
+            "description": "First successful completion after many failures",
+            "example": "[SLOW MOTION] 'Wait... DID I JUST DO IT?!'"
+          }
+        ],
+        "tension_mechanics": "Investment through watching struggle; payoff of eventual success; timer creates urgency throughout"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "10-20",
+        "target_demographics": ["Self-improvement interested", "18-35 age range"],
+        "ctr_drivers": ["Clear skill recognition", "Time constraint"],
+        "avd_drivers": ["Failure montages", "Breakthrough anticipation"],
+        "shareability": "High—inspirational content gets shared"
+      }
+    },
+
+    "12_the_human_coliseum": {
+      "archetype_id": "ARCH_012",
+      "archetype_name": "The Human Coliseum",
+      "alternate_names": ["The Social Experiment", "The Elimination Game", "The Jubilee Format"],
+      "category": "Entertainment",
+      "sub_category": "Social Experiment/Game Show",
+      "difficulty_to_produce": "High",
+      "faceless_adaptability": {
+        "score": 1,
+        "max_score": 10,
+        "notes": "Requires real human participants, studio setup, and social interaction. Cannot be made faceless. Core appeal is watching real human reactions and judgment."
+      },
+      "top_creators": [
+        {
+          "name": "Jubilee",
+          "channel": "@Jubilee",
+          "subscribers": "8M+",
+          "role": "Pioneer of format (Middle Ground, Odd One Out)"
+        },
+        {
+          "name": "Cut",
+          "channel": "@Cut",
+          "subscribers": "14M+",
+          "role": "Button elimination games, dating experiments"
+        },
+        {
+          "name": "Sidemen",
+          "channel": "@Sidemen",
+          "subscribers": "21M+",
+          "role": "UK group social games and challenges"
+        },
+        {
+          "name": "Nectar",
+          "channel": "@Nectar",
+          "subscribers": "3M+",
+          "role": "Dating and social experiments"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "Tribalism",
+        "secondary_drivers": ["Cringe (Vicarious Embarrassment)", "Judgment Satisfaction"],
+        "explanation": "Viewer instinctively picks sides or favorites. Heavy use of 'Cringe'—watching people behave under social pressure. The 'Button' mechanic (Cut) externalizes internal rejection, making emotional stakes visible and instantaneous. Gamified human interaction satisfies judgment impulse."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "[Number] vs 1: [Scenario]",
+          "alternate_formulas": [
+            "[Group A] vs [Group B]",
+            "Can [Number] Strangers Spot the [Role]?",
+            "Odd One Out: [Group/Scenario]"
+          ],
+          "rules": [
+            "Numbers create game show framing",
+            "Conflict or judgment implied in title",
+            "Scenario must be immediately understood"
+          ],
+          "examples": [
+            "20 Women vs 1 Sideman: Speed Dating",
+            "Millennial vs Gen Z: What's the Difference?",
+            "6 Vegans vs 1 Meat Eater",
+            "Can 100 Teens Spot the Fake Gen Z?"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Judgmental expressions, surprise, or confrontation",
+          "composition": "Two opposing groups staring at each other OR one person surrounded by many",
+          "color_scheme": "Team color coding; high contrast",
+          "text_overlays": "Numbers prominent; VS graphics",
+          "key_elements": ["Multiple faces visible", "Confrontation implied", "Studio setting visible"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:15",
+            "action": "The Highlight Reel",
+            "instruction": "Montage of the most shocking/awkward/angry moments from the video",
+            "example_script": "[RAPID CUTS] Gasps, shocked faces, dramatic moments, someone saying something controversial",
+            "purpose": "Promise drama and tension"
+          },
+          {
+            "timestamp": "0:15-0:30",
+            "action": "The Rules",
+            "instruction": "Simple, clear game mechanics",
+            "example_script": "'We brought 6 strangers together. One is a millionaire, the rest are broke. Can they spot the liar?'",
+            "purpose": "Establish stakes and game"
+          },
+          {
+            "timestamp": "0:30-0:60",
+            "action": "Round 1 Start",
+            "instruction": "Game begins immediately—first question asked",
+            "example_script": "[PARTICIPANTS SIT] 'Round 1. Introduce yourself and tell us what you do for a living.'",
+            "purpose": "Immediate engagement—no more setup needed"
+          }
+        ],
+        "key_technique": "The Button/Elimination mechanic makes internal judgment visible and instantaneous",
+        "forbidden_elements": ["Extended backstories", "Producer interference visible", "Breaking the game frame"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 2,
+          "range": "1-4 seconds",
+          "description": "Reaction-heavy—cuts focus on listener's face to show judgment"
+        },
+        "cuts_per_minute": "25-40",
+        "b_roll_patterns": [
+          "Multi-cam setup in single room",
+          "Reaction shots prioritized over speaker",
+          "Close-ups of judgment moments",
+          "Button press mechanics"
+        ],
+        "music_and_sound": {
+          "music_style": "Pizzicato strings (for awkwardness), tense drones (for conflict)",
+          "technique": "Sound effects on button presses; silence before dramatic moments"
+        },
+        "visual_effects": [
+          "Subtitles highlighting stuttering, pauses, specific phrases",
+          "Name tags and role identifiers",
+          "Elimination graphics",
+          "Score/vote counters"
+        ],
+        "studio_requirement": "White void/cyclorama—featureless studio keeps focus on faces",
+        "retention_editing_rules": [
+          "Reaction shots of listener's face during speaker",
+          "Dramatic pause before eliminations",
+          "Regular 'round' structure"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": "Variable (mid-round)",
+        "placement_description": "Multiple turns—each elimination is a mini-turn",
+        "mechanism": "The Elimination/Reveal",
+        "turn_types": [
+          {
+            "name": "The Elimination",
+            "description": "Player voted out—dramatic button press or vote reveal",
+            "example": "'The group has spoken. [Name], your button is red.'"
+          },
+          {
+            "name": "The Secret Reveal",
+            "description": "Hidden role or truth revealed",
+            "example": "'Actually... I AM the millionaire.'"
+          },
+          {
+            "name": "The Conflict Escalation",
+            "description": "Two participants clash over belief or statement",
+            "example": "'Wait, you actually believe that? Let me explain why you're wrong.'"
+          }
+        ],
+        "tension_mechanics": "Social friction is the content; judgment is the mechanic; reveals are the payoffs"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "15-30",
+        "target_demographics": ["Gen Z", "Social content enjoyers", "18-30 age range"],
+        "ctr_drivers": ["Conflict implied", "Numbers/game framing"],
+        "avd_drivers": ["Elimination anticipation", "Social drama"],
+        "shareability": "Very High—clips go viral on TikTok and Shorts"
+      }
+    },
+
+    "13_the_optimization_loop": {
+      "archetype_id": "ARCH_013",
+      "archetype_name": "The Optimization Loop",
+      "alternate_names": ["The Lifestyle Experiment", "The 30-Day Challenge", "The Productivity Experiment"],
+      "category": "Lifestyle",
+      "sub_category": "Self-Improvement/Productivity",
+      "difficulty_to_produce": "Medium",
+      "faceless_adaptability": {
+        "score": 5,
+        "max_score": 10,
+        "notes": "Can be partially adapted with B-roll lifestyle footage and voiceover. Loses personal connection but aesthetic is producible. Works better with consistent on-camera presence for relatability."
+      },
+      "top_creators": [
+        {
+          "name": "Ali Abdaal",
+          "channel": "@aliabdaal",
+          "subscribers": "6M+",
+          "role": "Productivity system reviews, doctor turned creator"
+        },
+        {
+          "name": "Matt D'Avella",
+          "channel": "@MattDAvella",
+          "subscribers": "4M+",
+          "role": "Minimalist habit experiments"
+        },
+        {
+          "name": "Thomas Frank",
+          "channel": "@ThomasFrank",
+          "subscribers": "3M+",
+          "role": "Student productivity and Notion systems"
+        },
+        {
+          "name": "Nathaniel Drew",
+          "channel": "@NathanielDrew",
+          "subscribers": "1.5M+",
+          "role": "Philosophical self-improvement"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "Aspiration",
+        "secondary_drivers": ["Relatability", "System Craving"],
+        "explanation": "Balances 'Aspiration' (the aesthetic, productive life viewer wants) with 'Relatability' (the struggle to maintain it). Creator admits to burnout or procrastination, making eventual solution ('The System') feel attainable. Appeals to desire for self-improvement and control over environment."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "I Tried [Habit/Method] for 30 Days",
+          "alternate_formulas": [
+            "The [Method] That Changed My Life",
+            "I [Action] Like [Famous Person] for [Time]",
+            "What Happened When I [Habit] Every Day for a Month"
+          ],
+          "rules": [
+            "Time constraint essential (30 days standard)",
+            "Method must be testable and trendy",
+            "Results implied in framing"
+          ],
+          "examples": [
+            "I Tried Waking Up at 5AM for 30 Days",
+            "I Followed Tim Ferriss's Morning Routine",
+            "30 Days of Meditation - What I Learned",
+            "I Deleted Social Media for a Month"
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Before/After split—tired vs. happy OR surrounded by specific tools",
+          "composition": "Clean, minimalist aesthetic; creator in productivity-coded environment",
+          "color_scheme": "Warm, inviting; soft lighting; earth tones",
+          "text_overlays": "Time period prominent; habit name",
+          "key_elements": ["Aesthetic environment visible", "Before/after implied", "Books/tools as props"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:20",
+            "action": "The Pain Point",
+            "instruction": "Establish relatable struggle—the problem to solve",
+            "example_script": "'I felt burnt out. I couldn't focus on anything for more than 10 minutes. Sound familiar?'",
+            "purpose": "Relatability—viewer sees themselves"
+          },
+          {
+            "timestamp": "0:20-0:40",
+            "action": "The Hypothesis",
+            "instruction": "Introduce the method being tested with authority hook",
+            "example_script": "'Then I discovered this method used by Navy SEALs and Silicon Valley CEOs. It sounded too good to be true.'",
+            "purpose": "Promise of solution with credibility"
+          },
+          {
+            "timestamp": "0:40-0:60",
+            "action": "The Plan/Rules",
+            "instruction": "State the experiment parameters clearly",
+            "example_script": "'For the next 30 days, I'm going to follow this exactly. No cheating. Here are the rules.'",
+            "purpose": "Set up experiment structure"
+          }
+        ],
+        "key_technique": "Treat life as a system to be optimized—scientific framing of personal development",
+        "forbidden_elements": ["Preaching without testing", "Guaranteeing results", "Ignoring failures"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 5,
+          "range": "3-10 seconds",
+          "description": "Calm—L-cuts used to blend dialogue smoothly"
+        },
+        "cuts_per_minute": "8-12",
+        "b_roll_patterns": [
+          "Cinematic vlog style—slow motion coffee pouring, typing, walking",
+          "Notion/app screen recordings",
+          "Journal and planning footage",
+          "Lifestyle aesthetic shots"
+        ],
+        "music_and_sound": {
+          "music_style": "Lo-fi beats, acoustic guitar, soft piano",
+          "technique": "Music supports relaxation/focus aesthetic"
+        },
+        "visual_effects": [
+          "Notion/productivity app overlays",
+          "Day counter graphics",
+          "Progress visualizations",
+          "Calendar animations"
+        ],
+        "aesthetic": "Productivity Chic—clean desks, plants, warm lighting, organized bookshelves",
+        "retention_editing_rules": [
+          "Week-by-week structure",
+          "Show the struggle (Day 15)",
+          "Quantify results where possible"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": 50,
+        "placement_description": "Day 15 (mid-video)—'The Struggle'",
+        "mechanism": "The Novelty Fade",
+        "turn_types": [
+          {
+            "name": "The Struggle",
+            "description": "Novelty wears off; habit becomes difficult",
+            "example": "'Day 12. I hate this. The excitement is gone and this just feels like work.'"
+          },
+          {
+            "name": "The Adaptation",
+            "description": "Creator modifies method to make it sustainable",
+            "example": "'So I made one change. And everything clicked.'"
+          },
+          {
+            "name": "The Insight",
+            "description": "Unexpected lesson beyond the surface habit",
+            "example": "'But the real lesson wasn't about waking up early. It was about...'"
+          }
+        ],
+        "tension_mechanics": "Show reality behind the aesthetic; honest struggle builds trust; system revelation is the payoff"
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "12-20",
+        "target_demographics": ["Self-improvement seekers", "25-40 age range", "Professionals"],
+        "ctr_drivers": ["Time constraint", "Trendy method"],
+        "avd_drivers": ["Journey structure", "Result anticipation"],
+        "shareability": "High—practical content gets saved and shared"
+      }
+    },
+
+    "14_the_burnout_confessional": {
+      "archetype_id": "ARCH_014",
+      "archetype_name": "The Burnout Confessional",
+      "alternate_names": ["The Vulnerable Pivot", "The I Quit Video", "The Truth Video"],
+      "category": "Meta/Personal",
+      "sub_category": "Creator Journey",
+      "difficulty_to_produce": "Low",
+      "faceless_adaptability": {
+        "score": 0,
+        "max_score": 10,
+        "notes": "Cannot be made faceless. Entire format requires authentic human vulnerability on camera. The raw, de-produced aesthetic is the point. AI/faceless would defeat purpose."
+      },
+      "top_creators": [
+        {
+          "name": "Any Creator Pivoting",
+          "channel": "Various",
+          "subscribers": "Varies",
+          "role": "Format used by established creators during transitions"
+        },
+        {
+          "name": "Lifestyle/Vlog Creators",
+          "channel": "Various",
+          "subscribers": "Varies",
+          "role": "Common in beauty, lifestyle, and daily vlog spaces"
+        },
+        {
+          "name": "Lilly Singh",
+          "channel": "@Lilly",
+          "subscribers": "14M+",
+          "role": "Notable 'break from YouTube' video"
+        }
+      ],
+      "psychological_mechanics": {
+        "primary_driver": "Parasocial Empathy",
+        "secondary_drivers": ["Pattern Interrupt", "Rescue Fantasy"],
+        "explanation": "Viewer, accustomed to high-energy entertainment, is arrested by sudden shift to raw vulnerability. Triggers 'Rescue Fantasy'—viewer wants to support creator. Also serves as 'Pattern Interrupt' in algorithm—slow, sad video amidst sea of loud, fast content stands out."
+      },
+      "click_logic": {
+        "title_syntax": {
+          "primary_formula": "I Quit.",
+          "alternate_formulas": [
+            "I Need to Be Honest With You",
+            "The Truth About Why I Disappeared",
+            "I'm Leaving YouTube",
+            "What I Couldn't Tell You"
+          ],
+          "rules": [
+            "Title must be short and stark",
+            "Period instead of ellipsis or exclamation",
+            "Vulnerability implied, not stated"
+          ],
+          "examples": [
+            "I Quit.",
+            "The Truth.",
+            "I'm Taking a Break.",
+            "This Needs to Stop."
+          ]
+        },
+        "thumbnail_meta": {
+          "face_expression": "Sad/tired—no makeup, natural lighting, genuine exhaustion",
+          "composition": "Just face, no props, no background emphasis",
+          "color_scheme": "Low contrast; sometimes black and white; desaturated",
+          "text_overlays": "None or minimal—title does the work",
+          "key_elements": ["Raw, unproduced look", "Eye contact with camera", "No 'YouTube face'"]
+        }
+      },
+      "hook_script": {
+        "total_duration_seconds": 60,
+        "structure": [
+          {
+            "timestamp": "0:00-0:30",
+            "action": "The Silence",
+            "instruction": "Creator sighs, looks down, adjusts camera. Long pause before speaking.",
+            "example_script": "[SIGH] [LOOKS DOWN] [ADJUSTS CAMERA] '...I didn't want to make this video.'",
+            "purpose": "Signal this is different—authenticity through discomfort"
+          },
+          {
+            "timestamp": "0:30-0:60",
+            "action": "The Statement",
+            "instruction": "Simple, honest statement of what's wrong",
+            "example_script": "'For the last year, I haven't been honest with you. Or with myself. And I need to talk about it.'",
+            "purpose": "Break fourth wall of curated content"
+          }
+        ],
+        "key_technique": "Deliberate de-production—the rawness IS the message",
+        "forbidden_elements": ["Fancy lighting", "Background music during confession", "Jump cuts to remove pauses", "Thumbnail-face reactions"]
+      },
+      "pacing_and_edit": {
+        "cut_speed": {
+          "average_seconds": 30,
+          "range": "20-120 seconds",
+          "description": "Raw—jump cuts kept in (to show 'realness') or long unedited takes"
+        },
+        "cuts_per_minute": "1-3",
+        "b_roll_patterns": [
+          "None—just face and camera",
+          "If any B-roll: behind-the-scenes showing stress",
+          "Phone notifications, calendar overload (optional)"
+        ],
+        "music_and_sound": {
+          "music_style": "Silence or very minimal sad piano",
+          "technique": "NO background music during core confession—silence is the point"
+        },
+        "visual_effects": [
+          "None",
+          "Possibly timestamps if video is very long"
+        ],
+        "aesthetic": "Deliberately 'De-Produced'—no fancy lighting, often handheld, sitting on floor",
+        "retention_editing_rules": [
+          "Long pauses and sighs kept in",
+          "Eye contact intense and unwavering",
+          "Minimal editing to preserve authenticity"
+        ]
+      },
+      "the_turn": {
+        "placement_percentage": 85,
+        "placement_description": "At the end—the Hope/Next Step",
+        "mechanism": "The Pivot to Hope",
+        "turn_types": [
+          {
+            "name": "The Hope Statement",
+            "description": "After vulnerability, creator shares path forward",
+            "example": "'I'm not leaving forever. But things have to change. Here's what I'm going to do differently.'"
+          },
+          {
+            "name": "The New Direction",
+            "description": "Announce content pivot or schedule change",
+            "example": "'From now on, I'm only posting when I have something meaningful to say.'"
+          },
+          {
+            "name": "The Gratitude Close",
+            "description": "Thank audience for support through tough time",
+            "example": "'Thank you for being here. I mean that. See you soon.'"
+          }
+        ],
+        "tension_mechanics": "Despair → Explanation → Hope. The turn from darkness to light provides emotional release."
+      },
+      "algorithmic_implications": {
+        "optimal_length_minutes": "8-20",
+        "target_demographics": ["Existing subscribers", "Fans of creator"],
+        "ctr_drivers": ["Pattern interrupt", "Concern for creator"],
+        "avd_drivers": ["Emotional investment", "Want to hear outcome"],
+        "shareability": "Medium—shared within fan communities",
+        "note": "Often performs differently than normal content—high engagement, lower views, but renews audience connection"
+      }
+    }
+  },
+  "cross_archetype_patterns": {
+    "hook_timing_rules": {
+      "3_second_rule": "50-60% of drop-offs occur in first 3 seconds",
+      "30_second_checkpoint": "Must establish core value proposition",
+      "60_second_contract": "Viewer should know exactly what they're getting and why they should stay"
+    },
+    "turn_placement_clusters": {
+      "early_turn_archetypes": ["The Curiosity Gap Mystery (40%)"],
+      "mid_turn_archetypes": ["The Adrenaline Cut (50%)", "The Optimization Loop (50%)", "The Survival Gauntlet (55%)"],
+      "late_mid_turn_archetypes": ["The Fortune File (60%)", "The Proficiency Sprint (65%)", "The Visual Anchor Documentary (65%)"],
+      "late_turn_archetypes": ["The Void Gaze (70%)", "The Fraud Hunter (75%)", "The Interrogation Room (80%)", "The Verdict Matrix (85%)", "The Burnout Confessional (85%)"]
+    },
+    "faceless_production_tiers": {
+      "tier_1_excellent": {
+        "score_range": "8-10",
+        "archetypes": ["The Interrogation Room", "The Void Gaze", "The Fortune File"],
+        "notes": "Voiceover + existing footage/graphics. Perfect for AI-assisted production."
+      },
+      "tier_2_adaptable": {
+        "score_range": "5-7",
+        "archetypes": ["The Fraud Hunter", "The VS Battle", "The Verdict Matrix", "The Visual Anchor Documentary", "The Curiosity Gap Mystery"],
+        "notes": "Can work faceless but loses some engagement. Requires high-quality assets."
+      },
+      "tier_3_difficult": {
+        "score_range": "1-4",
+        "archetypes": ["The Adrenaline Cut", "The Survival Gauntlet", "The Proficiency Sprint", "The Optimization Loop"],
+        "notes": "Requires human on camera for core appeal."
+      },
+      "tier_4_impossible": {
+        "score_range": "0-1",
+        "archetypes": ["The Human Coliseum", "The Burnout Confessional"],
+        "notes": "Cannot be made faceless. Human interaction/vulnerability is the content."
+      }
+    },
+    "music_pattern_mapping": {
+      "high_energy": ["The Adrenaline Cut", "The Survival Gauntlet", "The VS Battle"],
+      "dramatic_orchestral": ["The Fortune File", "The Visual Anchor Documentary"],
+      "dark_ambient": ["The Interrogation Room", "The Void Gaze"],
+      "subtle_supportive": ["The Verdict Matrix", "The Curiosity Gap Mystery", "The Fraud Hunter"],
+      "lofi_acoustic": ["The Optimization Loop", "The Proficiency Sprint"],
+      "silence_heavy": ["The Burnout Confessional", "The Interrogation Room"]
+    },
+    "thumbnail_color_psychology": {
+      "high_saturation_high_contrast": ["The Adrenaline Cut", "The Survival Gauntlet", "The Human Coliseum"],
+      "bogy_scheme": ["The Curiosity Gap Mystery"],
+      "desaturated_clinical": ["The Interrogation Room", "The Burnout Confessional"],
+      "dark_with_neon_accents": ["The Void Gaze", "The Fortune File"],
+      "natural_realistic": ["The Verdict Matrix", "The Optimization Loop"],
+      "team_color_split": ["The VS Battle"]
+    }
+  },
+  "ai_agent_implementation_notes": {
+    "content_classification": {
+      "instruction": "When classifying existing content, score against all 14 archetypes using hook_script structure match, pacing analysis, and turn placement detection. Primary archetype = highest score. Note hybrid archetypes.",
+      "hybrid_examples": [
+        "The Adrenaline Documentary (Challenge + Fortune File)",
+        "The Fraud Gauntlet (Fraud Hunter + Survival elements)",
+        "The Optimization Sprint (Productivity + Skill acquisition)"
+      ]
+    },
+    "content_generation": {
+      "instruction": "When generating content, select archetype based on: (1) subject matter fit, (2) production capability, (3) faceless adaptability score if applicable. Follow hook_script timestamps exactly. Implement turn at specified percentage.",
+      "mandatory_elements": [
+        "First 3 seconds must match thumbnail promise",
+        "Stakes established by 0:30",
+        "Turn implemented at archetype-specified percentage",
+        "Conclusion delivers on opening promise"
+      ]
+    },
+    "title_thumbnail_generation": {
+      "instruction": "Use title_syntax formulas and thumbnail_meta specifications exactly. Test multiple variations against archetype examples. Ensure title-thumbnail-hook alignment—all three must promise the same thing."
+    }
+  }
+}
