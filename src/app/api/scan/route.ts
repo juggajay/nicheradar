@@ -685,7 +685,7 @@ export async function POST() {
 
         const oppData = {
           topic_id: topicId,
-          keyword: idea.videoTitle,
+          keyword: idea.topic,
           category: idea.category,
           external_momentum: momentum,
           youtube_supply: supply,
