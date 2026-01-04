@@ -16,6 +16,30 @@ const HN_API = 'https://hacker-news.firebaseio.com/v0';
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
+// GIGA_TOPICS: Automatically saturated (Supply: 100)
+// These are so massive that no small creator can compete
+const GIGA_TOPICS = new Set([
+  // Languages
+  'python', 'javascript', 'java', 'typescript', 'rust', 'go', 'golang', 'swift',
+  'kotlin', 'ruby', 'php', 'c++', 'c#', 'scala', 'perl', 'r', 'matlab',
+  // Frameworks (generic)
+  'react', 'angular', 'vue', 'node', 'nodejs', 'django', 'flask', 'rails',
+  'spring', 'express', 'nextjs', 'next.js', 'laravel', 'dotnet', '.net',
+  // Big Tech
+  'google', 'apple', 'microsoft', 'amazon', 'meta', 'facebook', 'netflix',
+  'openai', 'nvidia', 'intel', 'amd', 'tesla', 'spacex', 'twitter', 'x',
+  // Platforms
+  'android', 'ios', 'windows', 'linux', 'macos', 'ubuntu', 'docker', 'kubernetes',
+  'aws', 'azure', 'gcp', 'heroku', 'vercel', 'netlify',
+  // Mega sites
+  'stackoverflow', 'stack overflow', 'github', 'gitlab', 'reddit', 'hackernews',
+  'hacker news', 'youtube', 'twitch', 'discord', 'slack', 'notion',
+  // Generic saturated terms
+  'programming', 'coding', 'software', 'web development', 'machine learning',
+  'artificial intelligence', 'ai', 'ml', 'data science', 'blockchain', 'crypto',
+  'bitcoin', 'ethereum', 'nft', 'startup', 'saas', 'api', 'database', 'sql',
+]);
+
 interface VideoIdea {
   topic: string;
   videoTitle: string;
@@ -49,30 +73,43 @@ async function extractVideoIdeasWithAI(
     .map((p, i) => `${i + 1}. [${p.platform}/${p.category}] "${p.title}"`)
     .join('\n');
 
-  const prompt = `You are a YouTube content strategist. Analyze these trending tech/business posts and extract YouTube video opportunities.
+  const prompt = `You are a YouTube content strategist finding NICHE opportunities. Extract SPECIFIC topics that a small creator could rank for.
 
-For each post that could make a good YouTube video, output a JSON object. Skip posts that are:
-- Too vague or generic (like "thoughts on AI?")
-- About company drama/layoffs/internal politics
-- Not actionable as video content
-- Pure news without educational angle
+CRITICAL RULES FOR TOPICS:
+1. Topic must be 1-4 words MAX (e.g., "Xr0 Verifier", "DeepSeek R1", "Cursor IDE")
+2. Topic must be a PROPER NOUN (product name, tool name, specific technology)
+3. NEVER use generic terms alone: Python, JavaScript, React, AI, Docker, Linux, etc.
+4. NEVER include sentence fragments like "interface for the" or "the best way to"
+5. If the post is about a SPECIFIC TOOL/PRODUCT, extract JUST that name
 
-For good posts, extract:
-- topic: The core subject (e.g., "Claude Code", "React Server Components", "Local LLM Setup")
-- videoTitle: A clickable YouTube title (e.g., "I Tried Claude Code for 30 Days - Here's What Happened")
-- contentType: One of: tutorial, news, comparison, review, explainer, howto
-- sourceIndex: The post number from the list
+SKIP posts that are:
+- About massive topics (Google, Apple, Python, JavaScript, React, Docker)
+- Generic advice ("how to learn coding", "best practices")
+- Company news/drama without educational angle
+- Too vague to make a focused video
+
+For GOOD posts, extract:
+- topic: The SPECIFIC product/tool name (1-4 words, capitalized)
+- videoTitle: A clickable YouTube title (under 60 chars)
+- contentType: tutorial | news | comparison | review | explainer | howto
+- sourceIndex: The post number
 
 POSTS:
 ${titlesText}
 
-Respond with ONLY a JSON array. Example:
+Respond with ONLY a JSON array. Examples of GOOD extractions:
 [
-  {"topic": "Claude Code", "videoTitle": "Claude Code Tutorial: Build Apps 10x Faster", "contentType": "tutorial", "sourceIndex": 1},
-  {"topic": "GPT-4 vs Claude 3.5", "videoTitle": "GPT-4 vs Claude 3.5: Which AI Wins in 2025?", "contentType": "comparison", "sourceIndex": 3}
+  {"topic": "Xr0 Verifier", "videoTitle": "Xr0 Verifier: Memory Safety in C Without Rewrites", "contentType": "explainer", "sourceIndex": 1},
+  {"topic": "DeepSeek R1", "videoTitle": "DeepSeek R1 vs GPT-4: Open Source Wins?", "contentType": "comparison", "sourceIndex": 3},
+  {"topic": "Cursor IDE", "videoTitle": "I Coded for 30 Days with Cursor IDE", "contentType": "review", "sourceIndex": 5}
 ]
 
-If no posts are video-worthy, return an empty array: []`;
+Examples of BAD extractions (DO NOT DO THIS):
+- {"topic": "Python"} - TOO GENERIC
+- {"topic": "interface for the"} - FRAGMENT
+- {"topic": "Xr0 Verifier: Guaranteeing Memory Safety..."} - TOO LONG, use just "Xr0 Verifier"
+
+If no posts have SPECIFIC, niche-worthy topics, return: []`;
 
   try {
     const response = await fetch(
@@ -112,7 +149,7 @@ If no posts are video-worthy, return an empty array: []`;
       sourceIndex: number;
     }>;
 
-    // Map back to full VideoIdea objects
+    // Map back to full VideoIdea objects with validation
     return ideas
       .filter((idea) => idea.sourceIndex > 0 && idea.sourceIndex <= posts.length)
       .map((idea) => {
@@ -129,6 +166,20 @@ If no posts are video-worthy, return an empty array: []`;
           sourcePlatform: source.platform as 'reddit' | 'hackernews',
           sourceCreatedAt: source.createdAt,
         };
+      })
+      // VALIDATION: Filter out garbage topics
+      .filter((idea) => {
+        // Check if topic is valid
+        if (!isValidTopic(idea.topic)) {
+          console.log(`Rejected invalid topic: "${idea.topic}"`);
+          return false;
+        }
+        // Check if it's a GIGA_TOPIC (will be marked saturated anyway, but skip entirely)
+        if (isGigaTopic(idea.topic)) {
+          console.log(`Rejected GIGA_TOPIC: "${idea.topic}"`);
+          return false;
+        }
+        return true;
       });
   } catch (e) {
     console.error('Gemini extraction error:', e);
@@ -136,22 +187,73 @@ If no posts are video-worthy, return an empty array: []`;
   }
 }
 
+// Check if topic is a GIGA_TOPIC (auto-saturated)
+function isGigaTopic(topic: string): boolean {
+  const normalized = topic.toLowerCase().trim();
+  // Direct match
+  if (GIGA_TOPICS.has(normalized)) return true;
+  // Check if topic IS just a giga topic (e.g., "Swift" or "Python tutorial")
+  for (const giga of GIGA_TOPICS) {
+    if (normalized === giga || normalized === `${giga} tutorial` || normalized === `${giga} guide`) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Validate topic quality - reject garbage
+function isValidTopic(topic: string): boolean {
+  if (!topic || topic.length < 3) return false;
+
+  // Reject if too long (full sentences)
+  if (topic.split(/\s+/).length > 6) return false;
+
+  // Reject if ends with connector words (fragments)
+  if (/\s+(for|the|and|or|to|a|an|in|on|with|of|is|are|was|were)$/i.test(topic)) return false;
+
+  // Reject if starts with connector words
+  if (/^(the|a|an|and|or|but|for|to|in|on)\s+/i.test(topic)) return false;
+
+  // Reject if it's mostly lowercase (not a proper noun/product)
+  const words = topic.split(/\s+/);
+  const capitalizedWords = words.filter(w => /^[A-Z]/.test(w));
+  if (words.length > 1 && capitalizedWords.length === 0) return false;
+
+  // Reject common garbage patterns
+  const garbagePatterns = [
+    /^(how|what|why|when|where|who)\s+/i, // Questions (not topics)
+    /^(this|that|these|those)\s+/i,
+    /^(my|your|our|their)\s+/i,
+    /\.\.\./,  // Truncated titles
+    /^\d+\s+/,  // Starts with number
+  ];
+  for (const pattern of garbagePatterns) {
+    if (pattern.test(topic)) return false;
+  }
+
+  return true;
+}
+
 // STAGE 1: Heuristic supply estimation (no API calls)
-// This is a rough estimate based on topic characteristics
 function estimateHeuristicSupply(topic: string, contentType: string): number {
+  // INSTANT KILL: If it's a GIGA_TOPIC, supply is maxed
+  if (isGigaTopic(topic)) {
+    return 100; // Fully saturated, no opportunity
+  }
+
   let supply = 50; // Default medium
 
   // Very specific topics = lower supply
   const wordCount = topic.split(/\s+/).length;
   if (wordCount >= 4) supply -= 15;
   else if (wordCount >= 3) supply -= 10;
-  else if (wordCount === 1) supply += 10; // Single words are often saturated
+  else if (wordCount === 1) supply += 15; // Single words are usually saturated
 
   // Version numbers indicate specificity (React 19, GPT-4o)
-  if (/\d+(\.\d+)?/.test(topic)) supply -= 15;
+  if (/\d+(\.\d+)?/.test(topic)) supply -= 20;
 
   // Comparison videos ("X vs Y") often have gaps
-  if (/\bvs\.?\b/i.test(topic)) supply -= 10;
+  if (/\bvs\.?\b/i.test(topic)) supply -= 15;
 
   // Tutorials for specific tools tend to have lower supply
   if (contentType === 'tutorial' && wordCount >= 2) supply -= 10;
@@ -160,12 +262,24 @@ function estimateHeuristicSupply(topic: string, contentType: string): number {
   const properNouns = topic.match(/\b[A-Z][a-z]+\b/g) || [];
   if (properNouns.length >= 2) supply -= 10;
 
+  // Check for partial GIGA_TOPIC matches (e.g., "Python Flask" still has Python)
+  const topicLower = topic.toLowerCase();
+  for (const giga of GIGA_TOPICS) {
+    if (topicLower.includes(giga) && topicLower !== giga) {
+      // Contains a giga topic but isn't JUST that topic
+      // e.g., "React Native Navigation" - still competitive
+      supply += 15;
+      break;
+    }
+  }
+
   // Common saturated patterns
   const saturatedPatterns = [
-    /how to (make money|lose weight|start|learn|be)/i,
-    /best (way|apps|tools|software)/i,
+    /how to (make money|lose weight|start|learn|be|get)/i,
+    /best (way|apps|tools|software|practices)/i,
     /beginner('s)? guide/i,
-    /\b(python|javascript|react|tutorial)\b$/i, // Generic tech terms alone
+    /complete guide/i,
+    /tutorial$/i, // Ends in just "tutorial"
   ];
   for (const pattern of saturatedPatterns) {
     if (pattern.test(topic)) {
@@ -174,7 +288,7 @@ function estimateHeuristicSupply(topic: string, contentType: string): number {
     }
   }
 
-  return Math.max(10, Math.min(90, supply));
+  return Math.max(10, Math.min(100, supply));
 }
 
 // Calculate momentum with RECENCY DECAY

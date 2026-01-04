@@ -2,7 +2,7 @@ import { FadeIn, SlideIn } from '@/components/motion';
 import { Card } from '@/components/ui/card';
 import { PhaseBadge, GapScore, SourceIcons, WatchButton } from '@/components/dashboard';
 import { TrendChart } from '@/components/charts/trend-chart';
-import { YouTubeResults } from '@/components/opportunity/youtube-results';
+import { YouTubeChecker } from '@/components/opportunity/youtube-checker';
 import { SourceLinks } from '@/components/opportunity/source-links';
 import { ArrowLeft, TrendingUp, Eye, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
@@ -177,11 +177,11 @@ export default async function OpportunityPage({ params }: PageProps) {
           <SlideIn direction="up" delay={0.2}>
             <Card className="border-slate-800/50 bg-slate-900/50 p-6">
               <h2 className="text-lg font-semibold text-white mb-4">YouTube Landscape</h2>
-              {youtubeData ? (
-                <YouTubeResults data={youtubeData} />
-              ) : (
-                <p className="text-slate-400 text-center py-8">YouTube data not yet available</p>
-              )}
+              <YouTubeChecker
+                opportunityId={opportunity.id}
+                keyword={opportunity.keyword}
+                initialData={youtubeData}
+              />
             </Card>
           </SlideIn>
         </div>
