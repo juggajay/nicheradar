@@ -79,7 +79,7 @@ export function ArchetypeSelector({ onSelect, selectedId }: ArchetypeSelectorPro
       </Button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-2 w-full max-h-80 overflow-y-auto rounded-lg border border-slate-700 bg-slate-900 shadow-xl">
+        <div className="absolute z-[100] mt-2 w-full max-h-[400px] overflow-y-auto rounded-lg border border-slate-700 bg-slate-900 shadow-xl">
           {archetypes.map((archetype) => (
             <button
               key={archetype.id}

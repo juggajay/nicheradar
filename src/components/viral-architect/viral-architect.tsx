@@ -71,7 +71,7 @@ export function ViralArchitect({ topicName, contextSummary, onClose }: ViralArch
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-hidden border-slate-800/50 bg-slate-900">
+      <Card className="w-full max-w-2xl max-h-[90vh] overflow-visible border-slate-800/50 bg-slate-900">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-800">
           <div className="flex items-center gap-3">
@@ -91,10 +91,10 @@ export function ViralArchitect({ topicName, contextSummary, onClose }: ViralArch
         </div>
 
         {/* Content */}
-        <div className="p-4 overflow-y-auto max-h-[calc(90vh-140px)]">
+        <div className="p-4 overflow-visible">
           {!blueprint ? (
-            <div className="space-y-4">
-              <div>
+            <div className="space-y-4 min-h-[300px]">
+              <div className="relative">
                 <label className="text-sm text-slate-400 mb-2 block">
                   Select Viral Archetype
                 </label>
@@ -105,7 +105,7 @@ export function ViralArchitect({ topicName, contextSummary, onClose }: ViralArch
               </div>
 
               {selectedArchetype && (
-                <div className="rounded-lg bg-slate-800/50 p-4">
+                <div className="rounded-lg bg-slate-800/50 p-4 mt-4">
                   <p className="text-sm text-slate-400 mb-2">Selected:</p>
                   <p className="font-medium text-white">{selectedArchetype.name}</p>
                   <p className="text-xs text-slate-500 mt-1">
@@ -140,7 +140,7 @@ export function ViralArchitect({ topicName, contextSummary, onClose }: ViralArch
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[calc(90vh-180px)] overflow-y-auto">
               <BlueprintDisplay
                 blueprint={blueprint}
                 archetype={{
