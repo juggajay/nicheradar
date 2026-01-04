@@ -2,49 +2,200 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
 const SUBREDDITS = [
-  { subreddit: 'technology', category: 'tech', min_score: 100 },
-  { subreddit: 'programming', category: 'tech', min_score: 75 },
-  { subreddit: 'webdev', category: 'tech', min_score: 50 },
-  { subreddit: 'LocalLLaMA', category: 'tech', min_score: 30 },
-  { subreddit: 'Entrepreneur', category: 'business', min_score: 50 },
-  { subreddit: 'SaaS', category: 'business', min_score: 30 },
-  { subreddit: 'startups', category: 'business', min_score: 50 },
+  { subreddit: 'technology', category: 'tech', min_score: 50 },
+  { subreddit: 'programming', category: 'tech', min_score: 50 },
+  { subreddit: 'webdev', category: 'tech', min_score: 30 },
+  { subreddit: 'LocalLLaMA', category: 'ai', min_score: 20 },
+  { subreddit: 'artificial', category: 'ai', min_score: 30 },
+  { subreddit: 'MachineLearning', category: 'ai', min_score: 30 },
+  { subreddit: 'Entrepreneur', category: 'business', min_score: 30 },
+  { subreddit: 'SaaS', category: 'business', min_score: 20 },
 ];
 
 const HN_API = 'https://hacker-news.firebaseio.com/v0';
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-async function fetchRedditPosts(subreddit: string, minScore: number) {
-  const posts: Array<{
-    title: string;
-    score: number;
-    num_comments: number;
-    url: string;
-    subreddit: string;
-  }> = [];
+interface VideoIdea {
+  topic: string;
+  videoTitle: string;
+  contentType: 'tutorial' | 'news' | 'comparison' | 'review' | 'explainer' | 'howto';
+  category: string;
+  sourceTitle: string;
+  sourceUrl: string;
+  sourceScore: number;
+  sourceComments: number;
+  sourcePlatform: 'reddit' | 'hackernews';
+}
+
+// Use Gemini to extract video ideas from post titles
+async function extractVideoIdeasWithAI(
+  posts: Array<{ title: string; url: string; score: number; comments: number; platform: string; category: string }>
+): Promise<VideoIdea[]> {
+  if (!GEMINI_API_KEY || posts.length === 0) {
+    console.log('No Gemini API key or no posts');
+    return [];
+  }
+
+  const titlesText = posts
+    .map((p, i) => `${i + 1}. [${p.platform}/${p.category}] "${p.title}"`)
+    .join('\n');
+
+  const prompt = `You are a YouTube content strategist. Analyze these trending tech/business posts and extract YouTube video opportunities.
+
+For each post that could make a good YouTube video, output a JSON object. Skip posts that are:
+- Too vague or generic (like "thoughts on AI?")
+- About company drama/layoffs/internal politics
+- Not actionable as video content
+- Pure news without educational angle
+
+For good posts, extract:
+- topic: The core subject (e.g., "Claude Code", "React Server Components", "Local LLM Setup")
+- videoTitle: A clickable YouTube title (e.g., "I Tried Claude Code for 30 Days - Here's What Happened")
+- contentType: One of: tutorial, news, comparison, review, explainer, howto
+- sourceIndex: The post number from the list
+
+POSTS:
+${titlesText}
+
+Respond with ONLY a JSON array. Example:
+[
+  {"topic": "Claude Code", "videoTitle": "Claude Code Tutorial: Build Apps 10x Faster", "contentType": "tutorial", "sourceIndex": 1},
+  {"topic": "GPT-4 vs Claude 3.5", "videoTitle": "GPT-4 vs Claude 3.5: Which AI Wins in 2025?", "contentType": "comparison", "sourceIndex": 3}
+]
+
+If no posts are video-worthy, return an empty array: []`;
 
   try {
     const response = await fetch(
-      `https://www.reddit.com/r/${subreddit}/rising.json?limit=25`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
-        headers: { 'User-Agent': 'NicheRadar/1.0' },
-        next: { revalidate: 0 },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 4096,
+          },
+        }),
       }
     );
 
-    if (!response.ok) return posts;
+    if (!response.ok) {
+      console.error('Gemini API error:', response.status, await response.text());
+      return [];
+    }
 
     const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    for (const post of data?.data?.children || []) {
-      const p = post.data;
-      if (p.score >= minScore) {
-        posts.push({
-          title: p.title,
-          score: p.score,
-          num_comments: p.num_comments,
-          url: `https://reddit.com${p.permalink}`,
-          subreddit,
-        });
+    // Extract JSON from response
+    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) {
+      console.error('No JSON found in Gemini response:', text);
+      return [];
+    }
+
+    const ideas = JSON.parse(jsonMatch[0]) as Array<{
+      topic: string;
+      videoTitle: string;
+      contentType: string;
+      sourceIndex: number;
+    }>;
+
+    // Map back to full VideoIdea objects
+    return ideas
+      .filter((idea) => idea.sourceIndex > 0 && idea.sourceIndex <= posts.length)
+      .map((idea) => {
+        const source = posts[idea.sourceIndex - 1];
+        return {
+          topic: idea.topic,
+          videoTitle: idea.videoTitle,
+          contentType: idea.contentType as VideoIdea['contentType'],
+          category: source.category,
+          sourceTitle: source.title,
+          sourceUrl: source.url,
+          sourceScore: source.score,
+          sourceComments: source.comments,
+          sourcePlatform: source.platform as 'reddit' | 'hackernews',
+        };
+      });
+  } catch (e) {
+    console.error('Gemini extraction error:', e);
+    return [];
+  }
+}
+
+// Check YouTube supply for a topic
+async function getYouTubeSupply(query: string): Promise<{ supply: number; totalResults: number }> {
+  if (!YOUTUBE_API_KEY) return { supply: 50, totalResults: 0 };
+
+  try {
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+      query
+    )}&type=video&maxResults=1&key=${YOUTUBE_API_KEY}`;
+
+    const res = await fetch(url);
+    if (!res.ok) return { supply: 50, totalResults: 0 };
+
+    const data = await res.json();
+    const total = data.pageInfo?.totalResults || 0;
+
+    // Convert to 0-100 supply score (lower = better opportunity)
+    let supply = 50;
+    if (total > 500000) supply = 95;
+    else if (total > 100000) supply = 85;
+    else if (total > 50000) supply = 70;
+    else if (total > 10000) supply = 55;
+    else if (total > 5000) supply = 40;
+    else if (total > 1000) supply = 30;
+    else if (total > 100) supply = 20;
+    else supply = 10;
+
+    return { supply, totalResults: total };
+  } catch {
+    return { supply: 50, totalResults: 0 };
+  }
+}
+
+async function fetchRedditPosts(subreddit: string, minScore: number, category: string) {
+  const posts: Array<{
+    title: string;
+    url: string;
+    score: number;
+    comments: number;
+    platform: string;
+    category: string;
+  }> = [];
+
+  try {
+    // Try both rising and hot
+    for (const sort of ['rising', 'hot']) {
+      const response = await fetch(
+        `https://www.reddit.com/r/${subreddit}/${sort}.json?limit=15`,
+        {
+          headers: { 'User-Agent': 'NicheRadar/1.0' },
+          next: { revalidate: 0 },
+        }
+      );
+
+      if (!response.ok) continue;
+
+      const data = await response.json();
+
+      for (const post of data?.data?.children || []) {
+        const p = post.data;
+        if (p.score >= minScore && !posts.some((x) => x.title === p.title)) {
+          posts.push({
+            title: p.title,
+            url: `https://reddit.com${p.permalink}`,
+            score: p.score,
+            comments: p.num_comments,
+            platform: 'reddit',
+            category,
+          });
+        }
       }
     }
   } catch (e) {
@@ -54,30 +205,37 @@ async function fetchRedditPosts(subreddit: string, minScore: number) {
   return posts;
 }
 
-async function fetchHNStories(limit = 50) {
+async function fetchHNStories() {
   const stories: Array<{
     title: string;
-    score: number;
-    num_comments: number;
     url: string;
-    hn_url: string;
+    score: number;
+    comments: number;
+    platform: string;
+    category: string;
   }> = [];
 
   try {
     const topRes = await fetch(`${HN_API}/topstories.json`);
-    const topIds = (await topRes.json()).slice(0, limit);
+    const topIds = (await topRes.json()).slice(0, 40);
 
-    for (const id of topIds.slice(0, 30)) {
-      const itemRes = await fetch(`${HN_API}/item/${id}.json`);
-      const item = await itemRes.json();
+    // Fetch in parallel for speed
+    const items = await Promise.all(
+      topIds.map(async (id: number) => {
+        const res = await fetch(`${HN_API}/item/${id}.json`);
+        return res.json();
+      })
+    );
 
-      if (item?.type === 'story' && (item.score || 0) >= 50) {
+    for (const item of items) {
+      if (item?.type === 'story' && (item.score || 0) >= 30) {
         stories.push({
           title: item.title || '',
+          url: item.url || `https://news.ycombinator.com/item?id=${item.id}`,
           score: item.score || 0,
-          num_comments: item.descendants || 0,
-          url: item.url || `https://news.ycombinator.com/item?id=${id}`,
-          hn_url: `https://news.ycombinator.com/item?id=${id}`,
+          comments: item.descendants || 0,
+          platform: 'hackernews',
+          category: 'tech',
         });
       }
     }
@@ -86,130 +244,6 @@ async function fetchHNStories(limit = 50) {
   }
 
   return stories;
-}
-
-// Common words to filter out - these appear in titles but aren't useful topics
-const STOP_WORDS = new Set([
-  // Basic English
-  'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with',
-  'by', 'from', 'as', 'is', 'was', 'are', 'were', 'been', 'be', 'have', 'has', 'had',
-  'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must',
-  'shall', 'can', 'need', 'dare', 'ought', 'used', 'it', 'its', 'this', 'that',
-  'these', 'those', 'i', 'you', 'he', 'she', 'we', 'they', 'what', 'which', 'who',
-  'whom', 'whose', 'where', 'when', 'why', 'how', 'all', 'each', 'every', 'both',
-  'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own',
-  'same', 'so', 'than', 'too', 'very', 'just', 'also', 'now', 'here', 'there',
-  'about', 'after', 'before', 'above', 'below', 'between', 'under', 'again',
-  'further', 'then', 'once', 'during', 'while', 'through', 'into', 'over',
-  'your', 'my', 'his', 'her', 'our', 'their', 'me', 'him', 'us', 'them',
-  // Common verbs
-  'get', 'got', 'getting', 'make', 'made', 'making', 'take', 'took', 'taking',
-  'come', 'came', 'coming', 'go', 'went', 'going', 'know', 'knew', 'known',
-  'think', 'thought', 'see', 'saw', 'seen', 'want', 'use', 'find', 'give',
-  'tell', 'ask', 'work', 'seem', 'feel', 'try', 'leave', 'call', 'keep',
-  'let', 'begin', 'show', 'hear', 'play', 'run', 'move', 'live', 'believe',
-  'build', 'built', 'using', 'write', 'wrote', 'read', 'learn', 'learning',
-  // Generic adjectives/nouns
-  'total', 'new', 'old', 'big', 'small', 'large', 'great', 'good', 'bad',
-  'first', 'last', 'long', 'little', 'much', 'many', 'lot', 'way', 'thing',
-  'man', 'woman', 'child', 'world', 'life', 'hand', 'part', 'place', 'case',
-  'week', 'company', 'system', 'program', 'question', 'government', 'number',
-  'night', 'point', 'home', 'water', 'room', 'mother', 'area', 'money',
-  'story', 'fact', 'month', 'different', 'kind', 'head', 'far', 'black',
-  'white', 'real', 'back', 'yet', 'ago', 'done', 'best', 'years', 'year',
-  'days', 'day', 'time', 'times', 'people', 'person', 'something', 'anything',
-  'everything', 'nothing', 'someone', 'anyone', 'everyone', 'always', 'never',
-  // Platform/meta words (not topics themselves)
-  'blog', 'blogs', 'post', 'posts', 'article', 'articles', 'news', 'update',
-  'updates', 'hacker', 'reddit', 'popular', 'being', 'today', 'yesterday',
-  'thread', 'comment', 'comments', 'discussion', 'link', 'links', 'site',
-  'website', 'page', 'source', 'sources', 'release', 'released', 'announces',
-  'announced', 'launches', 'launched', 'introduces', 'introduced', 'reveals',
-  // Generic tech words (too broad to be useful)
-  'code', 'software', 'developer', 'developers', 'programming', 'tech',
-  'technology', 'app', 'apps', 'application', 'startup', 'startups',
-  'project', 'projects', 'tool', 'tools', 'library', 'framework',
-  'open', 'free', 'simple', 'easy', 'hard', 'fast', 'slow', 'better',
-  'worse', 'features', 'feature', 'users', 'user', 'data', 'file', 'files',
-]);
-
-function extractKeywords(text: string): string[] {
-  if (!text) return [];
-
-  // Remove common prefixes
-  let cleaned = text.replace(
-    /^(TIL|ELI5|CMV|TIFU|AMA|WIBTA|AITA|Show HN|Ask HN|Tell HN|Launch HN)\s*[-:–]?\s*/i,
-    ''
-  );
-
-  const keywords: string[] = [];
-
-  // 1. Find quoted terms (highest priority - explicit topic names)
-  const quoted = cleaned.match(/"([^"]+)"/g);
-  if (quoted) {
-    keywords.push(...quoted.map((q) => q.replace(/"/g, '')));
-  }
-
-  // 2. Find well-known tech patterns with version numbers
-  // Examples: "GPT-4o", "Claude 3.5", "React 19", "Python 3.12", "iOS 18"
-  const versionedTech = cleaned.match(/\b(?:GPT|Claude|Gemini|Llama|Mistral|React|Vue|Angular|Node|Python|Ruby|PHP|Java|Swift|Kotlin|Rust|Go|TypeScript|JavaScript|iOS|Android|macOS|Windows|Linux|Docker|Kubernetes|AWS|GCP|Azure|Next|Nuxt|Svelte|Tailwind|PostgreSQL|MongoDB|Redis|GraphQL|REST|API|SDK|CLI|LLM|RAG|ML|AI)(?:[-.\s]?\d+(?:\.\d+)?[a-z]?)?\b/gi);
-  if (versionedTech) {
-    keywords.push(...versionedTech);
-  }
-
-  // 3. Find product/company names (PascalCase or with numbers)
-  // Examples: "ChatGPT", "OpenAI", "Anthropic", "GitHub", "Vercel", "Supabase"
-  const productNames = cleaned.match(/\b[A-Z][a-z]+(?:[A-Z][a-z]+)+\b/g);
-  if (productNames) {
-    keywords.push(...productNames.filter(p =>
-      p.length > 4 &&
-      !['The', 'This', 'That', 'What', 'When', 'Where', 'Why', 'How', 'Who'].some(w => p.startsWith(w))
-    ));
-  }
-
-  // 4. Find ALL CAPS acronyms (3-6 letters) - often tech terms
-  // Examples: "API", "LLM", "RAG", "CUDA", "WASM", "HTMX"
-  const acronyms = cleaned.match(/\b[A-Z]{3,6}\b/g);
-  if (acronyms) {
-    const goodAcronyms = acronyms.filter(a =>
-      !['TIL', 'ELI', 'CMV', 'AMA', 'PSA', 'IMO', 'TBH', 'FYI', 'IIRC', 'AFAIK', 'THE', 'AND', 'FOR', 'BUT', 'NOT'].includes(a)
-    );
-    keywords.push(...goodAcronyms);
-  }
-
-  // 5. Find "X vs Y" comparisons (great for content gaps)
-  const vsPattern = cleaned.match(/\b([A-Z][a-zA-Z0-9]*)\s+vs\.?\s+([A-Z][a-zA-Z0-9]*)\b/gi);
-  if (vsPattern) {
-    keywords.push(...vsPattern);
-  }
-
-  // 6. Find specific phrases like "X for Y" or "how to X"
-  const forPattern = cleaned.match(/\b([A-Z][a-zA-Z0-9]+)\s+for\s+([a-zA-Z]+(?:\s+[a-zA-Z]+)?)\b/gi);
-  if (forPattern) {
-    keywords.push(...forPattern.filter(p => p.length > 10));
-  }
-
-  // Normalize, filter junk, and dedupe
-  const seen = new Set<string>();
-  return keywords
-    .map((k) => k.trim())
-    .filter((k) => {
-      const lower = k.toLowerCase();
-      // Filter out very short keywords
-      if (k.length <= 2) return false;
-      // Allow 3-letter acronyms if uppercase
-      if (k.length === 3 && k !== k.toUpperCase()) return false;
-      if (seen.has(lower)) return false;
-      if (/^\d+$/.test(k)) return false;
-      // Check if all words are stop words
-      const words = lower.split(/\s+/);
-      if (words.every(w => STOP_WORDS.has(w))) return false;
-      // Filter single stop words
-      if (words.length === 1 && STOP_WORDS.has(lower)) return false;
-      seen.add(lower);
-      return true;
-    })
-    .slice(0, 3); // Take top 3 keywords per item
 }
 
 export async function POST() {
@@ -226,105 +260,116 @@ export async function POST() {
   const scanId = scanLog?.id;
 
   try {
-    // Collect from Reddit
-    const redditPosts: Array<{
+    // Step 1: Collect posts from all sources
+    console.log('Collecting posts...');
+    const allPosts: Array<{
       title: string;
-      score: number;
-      num_comments: number;
       url: string;
-      subreddit: string;
-      category?: string;
+      score: number;
+      comments: number;
+      platform: string;
+      category: string;
     }> = [];
+
+    // Fetch Reddit posts
     for (const config of SUBREDDITS) {
-      const posts = await fetchRedditPosts(config.subreddit, config.min_score);
-      redditPosts.push(...posts.map((p) => ({ ...p, category: config.category })));
-      await new Promise((r) => setTimeout(r, 500)); // Rate limit
+      const posts = await fetchRedditPosts(config.subreddit, config.min_score, config.category);
+      allPosts.push(...posts);
+      await new Promise((r) => setTimeout(r, 300)); // Rate limit
     }
 
-    // Collect from HN
+    // Fetch HN stories
     const hnStories = await fetchHNStories();
+    allPosts.push(...hnStories);
 
-    // Process into topics
-    const topicsMap = new Map<
-      string,
-      {
-        keyword: string;
-        category: string;
-        sources: Array<{
-          source: string;
-          source_url: string;
-          source_title: string;
-          source_metadata: Record<string, unknown>;
-        }>;
-      }
-    >();
+    console.log(`Collected ${allPosts.length} posts`);
 
-    // Process Reddit
-    for (const post of redditPosts) {
-      const keywords = extractKeywords(post.title);
-      for (const kw of keywords) {
-        const norm = kw.toLowerCase().replace(/[^\w\s]/g, '').trim();
-        if (!topicsMap.has(norm)) {
-          topicsMap.set(norm, {
-            keyword: kw,
-            category: post.category || 'uncategorised',
-            sources: [],
-          });
-        }
-        topicsMap.get(norm)!.sources.push({
-          source: 'reddit',
-          source_url: post.url,
-          source_title: post.title,
-          source_metadata: {
-            subreddit: post.subreddit,
-            score: post.score,
-            num_comments: post.num_comments,
-          },
-        });
-      }
+    if (allPosts.length === 0) {
+      throw new Error('No posts collected from any source');
     }
 
-    // Process HN
-    for (const story of hnStories) {
-      const keywords = extractKeywords(story.title);
-      for (const kw of keywords) {
-        const norm = kw.toLowerCase().replace(/[^\w\s]/g, '').trim();
-        if (!topicsMap.has(norm)) {
-          topicsMap.set(norm, {
-            keyword: kw,
-            category: 'tech',
-            sources: [],
-          });
-        }
-        topicsMap.get(norm)!.sources.push({
-          source: 'hackernews',
-          source_url: story.hn_url,
-          source_title: story.title,
-          source_metadata: {
-            score: story.score,
-            num_comments: story.num_comments,
-          },
-        });
-      }
+    // Step 2: Use Gemini AI to extract video ideas
+    console.log('Extracting video ideas with AI...');
+    const videoIdeas = await extractVideoIdeasWithAI(allPosts);
+    console.log(`AI extracted ${videoIdeas.length} video ideas`);
+
+    if (videoIdeas.length === 0) {
+      // Update scan log with no results
+      await supabase
+        .from('scan_log')
+        .update({
+          status: 'completed',
+          completed_at: new Date().toISOString(),
+          topics_detected: allPosts.length,
+          topics_updated: 0,
+          opportunities_created: 0,
+          duration_seconds: Math.round((Date.now() - startTime) / 1000),
+        })
+        .eq('id', scanId);
+
+      return NextResponse.json({
+        success: true,
+        stats: {
+          posts_collected: allPosts.length,
+          video_ideas: 0,
+          opportunities_created: 0,
+          message: 'No video-worthy topics found in current trending posts',
+        },
+      });
     }
 
-    let topicsUpdated = 0;
+    // Step 3: Check YouTube supply and create opportunities
+    console.log('Checking YouTube supply...');
     let opportunitiesCreated = 0;
+    let topicsUpdated = 0;
 
-    // Upsert topics and create opportunities
-    for (const [norm, topicData] of topicsMap) {
+    for (const idea of videoIdeas) {
       try {
+        // Check YouTube supply
+        const { supply, totalResults } = await getYouTubeSupply(idea.topic);
+
+        // Calculate momentum based on source engagement
+        const baseMomentum = Math.min(50, Math.log10(idea.sourceScore + 1) * 25);
+        const commentBonus = Math.min(25, idea.sourceComments / 5);
+        const momentum = Math.min(100, Math.round(baseMomentum + commentBonus));
+
+        // Calculate gap score
+        const gap = Math.round(momentum * (1 - supply / 100) * 10) / 10;
+
+        // Determine phase
+        const phase =
+          gap >= 70 && supply < 30
+            ? 'innovation'
+            : gap >= 50 && supply < 50
+            ? 'emergence'
+            : gap >= 35
+            ? 'growth'
+            : gap >= 20
+            ? 'maturity'
+            : 'saturated';
+
+        // Determine confidence
+        const confidence =
+          momentum >= 60 && supply < 40
+            ? 'high'
+            : momentum >= 40
+            ? 'medium'
+            : 'low';
+
+        // Normalize topic for deduplication
+        const normalized = idea.topic.toLowerCase().replace(/[^\w\s]/g, '').trim();
+
         // Check if topic exists
-        const { data: existing } = await supabase
+        const { data: existingTopic } = await supabase
           .from('topics')
           .select('id')
-          .eq('keyword_normalised', norm)
+          .eq('keyword_normalised', normalized)
           .single();
 
         let topicId: string;
 
-        if (existing) {
-          topicId = existing.id;
+        if (existingTopic) {
+          topicId = existingTopic.id;
           await supabase
             .from('topics')
             .update({ last_seen_at: new Date().toISOString(), is_active: true })
@@ -333,102 +378,39 @@ export async function POST() {
           const { data: newTopic } = await supabase
             .from('topics')
             .insert({
-              keyword: topicData.keyword,
-              keyword_normalised: norm,
-              category: topicData.category,
+              keyword: idea.topic,
+              keyword_normalised: normalized,
+              category: idea.category,
             })
             .select()
             .single();
           topicId = newTopic!.id;
         }
 
-        // Insert sources
-        for (const source of topicData.sources) {
-          await supabase.from('topic_sources').upsert(
-            {
-              topic_id: topicId,
-              source: source.source,
-              source_url: source.source_url,
-              source_title: source.source_title,
-              source_metadata: source.source_metadata,
+        // Add source
+        await supabase.from('topic_sources').upsert(
+          {
+            topic_id: topicId,
+            source: idea.sourcePlatform,
+            source_url: idea.sourceUrl,
+            source_title: idea.sourceTitle,
+            source_metadata: {
+              score: idea.sourceScore,
+              num_comments: idea.sourceComments,
+              video_title_suggestion: idea.videoTitle,
+              content_type: idea.contentType,
             },
-            { onConflict: 'topic_id,source,source_url' }
-          );
-        }
+          },
+          { onConflict: 'topic_id,source,source_url' }
+        );
 
-        // Calculate scores
-        let redditScore = 0;
-        let hnScore = 0;
-        let redditComments = 0;
-        let hnComments = 0;
-
-        for (const s of topicData.sources) {
-          const meta = s.source_metadata as Record<string, number>;
-          if (s.source === 'reddit') {
-            redditScore += meta.score || 0;
-            redditComments += meta.num_comments || 0;
-          }
-          if (s.source === 'hackernews') {
-            hnScore += meta.score || 0;
-            hnComments += meta.num_comments || 0;
-          }
-        }
-
-        // Better momentum calculation using log scale
-        // HN: 50 points = decent, 200+ = viral
-        // Reddit: 100 points = decent, 500+ = viral
-        const hnMomentum = hnScore > 0 ? Math.min(50, Math.log10(hnScore + 1) * 22) : 0;
-        const redditMomentum = redditScore > 0 ? Math.min(50, Math.log10(redditScore + 1) * 18) : 0;
-
-        // Bonus for engagement (comments)
-        const engagementBonus = Math.min(20, (hnComments + redditComments) / 10);
-
-        // Bonus for multiple sources
-        const sourceCount = new Set(topicData.sources.map((s) => s.source)).size;
-        const sourceBonus = sourceCount >= 2 ? 15 : 0;
-
-        const momentum = Math.min(100, hnMomentum + redditMomentum + engagementBonus + sourceBonus);
-
-        // Estimate supply based on keyword characteristics
-        // Long-tail keywords typically have lower supply
-        const wordCount = topicData.keyword.split(/\s+/).length;
-        const hasNumbers = /\d/.test(topicData.keyword);
-        const isLongTail = wordCount >= 3;
-
-        let supply = 60; // Default medium-high
-        if (isLongTail) supply -= 20;
-        if (hasNumbers) supply -= 10;
-        if (wordCount >= 4) supply -= 10;
-        supply = Math.max(10, Math.min(90, supply));
-
-        const gap = Math.round(momentum * (1 - supply / 100) * 10) / 10;
-
-        // Store signal
+        // Add signal
         await supabase.from('topic_signals').insert({
           topic_id: topicId,
-          reddit_total_score: redditScore || null,
-          hn_total_score: hnScore || null,
           momentum_score: momentum,
+          reddit_total_score: idea.sourcePlatform === 'reddit' ? idea.sourceScore : null,
+          hn_total_score: idea.sourcePlatform === 'hackernews' ? idea.sourceScore : null,
         });
-
-        // Determine phase and confidence
-        const phase =
-          gap >= 80 && supply < 20
-            ? 'innovation'
-            : gap >= 60 && supply < 40
-            ? 'emergence'
-            : gap >= 40
-            ? 'growth'
-            : gap >= 20
-            ? 'maturity'
-            : 'saturated';
-
-        const confidence =
-          sourceCount >= 3 && momentum >= 70
-            ? 'high'
-            : sourceCount >= 2 && momentum >= 50
-            ? 'medium'
-            : 'low';
 
         // Upsert opportunity
         const { data: existingOpp } = await supabase
@@ -439,14 +421,14 @@ export async function POST() {
 
         const oppData = {
           topic_id: topicId,
+          keyword: idea.videoTitle, // Use the AI-generated title as the display keyword
+          category: idea.category,
           external_momentum: momentum,
           youtube_supply: supply,
           gap_score: gap,
           phase,
           confidence,
-          keyword: topicData.keyword,
-          category: topicData.category,
-          sources: [...new Set(topicData.sources.map((s) => s.source))],
+          sources: [idea.sourcePlatform],
           calculated_at: new Date().toISOString(),
         };
 
@@ -458,8 +440,11 @@ export async function POST() {
         }
 
         topicsUpdated++;
+
+        // Small delay to avoid rate limits
+        await new Promise((r) => setTimeout(r, 100));
       } catch (e) {
-        console.error(`Error processing topic ${norm}:`, e);
+        console.error(`Error processing idea ${idea.topic}:`, e);
       }
     }
 
@@ -471,7 +456,7 @@ export async function POST() {
       .update({
         status: 'completed',
         completed_at: new Date().toISOString(),
-        topics_detected: redditPosts.length + hnStories.length,
+        topics_detected: allPosts.length,
         topics_updated: topicsUpdated,
         opportunities_created: opportunitiesCreated,
         duration_seconds: duration,
@@ -481,8 +466,8 @@ export async function POST() {
     return NextResponse.json({
       success: true,
       stats: {
-        reddit_posts: redditPosts.length,
-        hn_stories: hnStories.length,
+        posts_collected: allPosts.length,
+        video_ideas: videoIdeas.length,
         topics_updated: topicsUpdated,
         opportunities_created: opportunitiesCreated,
         duration_seconds: duration,
@@ -502,7 +487,7 @@ export async function POST() {
         .eq('id', scanId);
     }
 
-    return NextResponse.json({ error: 'Scan failed' }, { status: 500 });
+    return NextResponse.json({ error: 'Scan failed', details: String(error) }, { status: 500 });
   }
 }
 
