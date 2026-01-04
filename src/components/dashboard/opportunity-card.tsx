@@ -59,10 +59,11 @@ export function OpportunityCard({ opportunity, index = 0 }: OpportunityCardProps
             </div>
           </div>
 
-          {opportunity.confidence === 'high' && (
+          {/* Only show "High" badge for actually good opportunities */}
+          {opportunity.confidence === 'high' && opportunity.gap_score >= 30 && opportunity.phase !== 'saturated' && (
             <div className="absolute top-0 right-0 h-20 w-20 overflow-hidden">
               <div className="absolute -right-6 top-3 w-24 rotate-45 bg-gradient-to-r from-emerald-500 to-green-500 py-1 text-center text-xs font-medium text-white">
-                High
+                Verified
               </div>
             </div>
           )}
