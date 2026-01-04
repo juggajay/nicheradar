@@ -26,11 +26,19 @@ interface VideoIdea {
   sourceScore: number;
   sourceComments: number;
   sourcePlatform: 'reddit' | 'hackernews';
+  sourceCreatedAt?: number; // Unix timestamp
+  // Stage 1 scores (heuristic)
+  heuristicSupply?: number;
+  momentum?: number;
+  initialGap?: number;
+  // Stage 2 scores (YouTube API verified)
+  verifiedSupply?: number;
+  finalGap?: number;
 }
 
 // Use Gemini to extract video ideas from post titles
 async function extractVideoIdeasWithAI(
-  posts: Array<{ title: string; url: string; score: number; comments: number; platform: string; category: string }>
+  posts: Array<{ title: string; url: string; score: number; comments: number; platform: string; category: string; createdAt: number }>
 ): Promise<VideoIdea[]> {
   if (!GEMINI_API_KEY || posts.length === 0) {
     console.log('No Gemini API key or no posts');
@@ -119,6 +127,7 @@ If no posts are video-worthy, return an empty array: []`;
           sourceScore: source.score,
           sourceComments: source.comments,
           sourcePlatform: source.platform as 'reddit' | 'hackernews',
+          sourceCreatedAt: source.createdAt,
         };
       });
   } catch (e) {
@@ -127,7 +136,71 @@ If no posts are video-worthy, return an empty array: []`;
   }
 }
 
-// Check YouTube supply for a topic
+// STAGE 1: Heuristic supply estimation (no API calls)
+// This is a rough estimate based on topic characteristics
+function estimateHeuristicSupply(topic: string, contentType: string): number {
+  let supply = 50; // Default medium
+
+  // Very specific topics = lower supply
+  const wordCount = topic.split(/\s+/).length;
+  if (wordCount >= 4) supply -= 15;
+  else if (wordCount >= 3) supply -= 10;
+  else if (wordCount === 1) supply += 10; // Single words are often saturated
+
+  // Version numbers indicate specificity (React 19, GPT-4o)
+  if (/\d+(\.\d+)?/.test(topic)) supply -= 15;
+
+  // Comparison videos ("X vs Y") often have gaps
+  if (/\bvs\.?\b/i.test(topic)) supply -= 10;
+
+  // Tutorials for specific tools tend to have lower supply
+  if (contentType === 'tutorial' && wordCount >= 2) supply -= 10;
+
+  // Proper nouns (capitalized) are more specific
+  const properNouns = topic.match(/\b[A-Z][a-z]+\b/g) || [];
+  if (properNouns.length >= 2) supply -= 10;
+
+  // Common saturated patterns
+  const saturatedPatterns = [
+    /how to (make money|lose weight|start|learn|be)/i,
+    /best (way|apps|tools|software)/i,
+    /beginner('s)? guide/i,
+    /\b(python|javascript|react|tutorial)\b$/i, // Generic tech terms alone
+  ];
+  for (const pattern of saturatedPatterns) {
+    if (pattern.test(topic)) {
+      supply += 20;
+      break;
+    }
+  }
+
+  return Math.max(10, Math.min(90, supply));
+}
+
+// Calculate momentum with RECENCY DECAY
+// Fresh posts get boosted, stale posts get penalized
+function calculateMomentumWithRecency(
+  score: number,
+  comments: number,
+  createdAt: number
+): number {
+  // Base momentum from engagement
+  const baseMomentum = Math.min(50, Math.log10(score + 1) * 25);
+  const commentBonus = Math.min(25, comments / 5);
+
+  // Recency decay: 1 / sqrt(hours_since_post)
+  const nowSeconds = Date.now() / 1000;
+  const hoursSincePost = Math.max(0.5, (nowSeconds - createdAt) / 3600);
+
+  // Fresh posts (< 2 hours) get up to 1.4x boost
+  // Old posts (> 24 hours) get penalized down to 0.5x
+  const recencyMultiplier = Math.min(1.4, 1 / Math.sqrt(hoursSincePost / 2));
+
+  const momentum = Math.round((baseMomentum + commentBonus) * recencyMultiplier);
+  return Math.min(100, Math.max(10, momentum));
+}
+
+// STAGE 2: Check YouTube supply for a topic (uses API quota)
 async function getYouTubeSupply(query: string): Promise<{ supply: number; totalResults: number }> {
   if (!YOUTUBE_API_KEY) return { supply: 50, totalResults: 0 };
 
@@ -167,10 +240,11 @@ async function fetchRedditPosts(subreddit: string, minScore: number, category: s
     comments: number;
     platform: string;
     category: string;
+    createdAt: number;
   }> = [];
 
   try {
-    // Try both rising and hot
+    // Try both rising and hot - rising catches emerging trends
     for (const sort of ['rising', 'hot']) {
       const response = await fetch(
         `https://www.reddit.com/r/${subreddit}/${sort}.json?limit=15`,
@@ -194,6 +268,7 @@ async function fetchRedditPosts(subreddit: string, minScore: number, category: s
             comments: p.num_comments,
             platform: 'reddit',
             category,
+            createdAt: p.created_utc || Date.now() / 1000,
           });
         }
       }
@@ -213,6 +288,7 @@ async function fetchHNStories() {
     comments: number;
     platform: string;
     category: string;
+    createdAt: number;
   }> = [];
 
   try {
@@ -236,6 +312,7 @@ async function fetchHNStories() {
           comments: item.descendants || 0,
           platform: 'hackernews',
           category: 'tech',
+          createdAt: item.time || Date.now() / 1000,
         });
       }
     }
@@ -260,8 +337,8 @@ export async function POST() {
   const scanId = scanLog?.id;
 
   try {
-    // Step 1: Collect posts from all sources
-    console.log('Collecting posts...');
+    // ========== STEP 1: Collect posts from all sources ==========
+    console.log('Step 1: Collecting posts...');
     const allPosts: Array<{
       title: string;
       url: string;
@@ -269,6 +346,7 @@ export async function POST() {
       comments: number;
       platform: string;
       category: string;
+      createdAt: number;
     }> = [];
 
     // Fetch Reddit posts
@@ -288,13 +366,12 @@ export async function POST() {
       throw new Error('No posts collected from any source');
     }
 
-    // Step 2: Use Gemini AI to extract video ideas
-    console.log('Extracting video ideas with AI...');
+    // ========== STEP 2: AI extraction ==========
+    console.log('Step 2: Extracting video ideas with AI...');
     const videoIdeas = await extractVideoIdeasWithAI(allPosts);
     console.log(`AI extracted ${videoIdeas.length} video ideas`);
 
     if (videoIdeas.length === 0) {
-      // Update scan log with no results
       await supabase
         .from('scan_log')
         .update({
@@ -318,41 +395,75 @@ export async function POST() {
       });
     }
 
-    // Step 3: Check YouTube supply and create opportunities
-    console.log('Checking YouTube supply...');
+    // ========== STAGE 1: Heuristic scoring (NO YouTube API) ==========
+    console.log('Stage 1: Calculating heuristic scores...');
+    for (const idea of videoIdeas) {
+      // Calculate momentum with recency decay
+      idea.momentum = calculateMomentumWithRecency(
+        idea.sourceScore,
+        idea.sourceComments,
+        idea.sourceCreatedAt || Date.now() / 1000
+      );
+
+      // Estimate supply heuristically (no API call)
+      idea.heuristicSupply = estimateHeuristicSupply(idea.topic, idea.contentType);
+
+      // Calculate initial gap score
+      idea.initialGap = Math.round(idea.momentum * (1 - idea.heuristicSupply / 100) * 10) / 10;
+    }
+
+    // Sort by initial gap score (highest first)
+    videoIdeas.sort((a, b) => (b.initialGap || 0) - (a.initialGap || 0));
+
+    console.log(`Stage 1 complete. Top idea: "${videoIdeas[0]?.topic}" (gap: ${videoIdeas[0]?.initialGap})`);
+
+    // ========== STAGE 2: YouTube API verification (TOP 15 ONLY) ==========
+    const TOP_N = 15; // Only verify top 15 to save API quota
+    const topIdeas = videoIdeas.slice(0, TOP_N);
+
+    console.log(`Stage 2: Verifying top ${topIdeas.length} ideas with YouTube API...`);
+
+    for (const idea of topIdeas) {
+      const { supply } = await getYouTubeSupply(idea.topic);
+      idea.verifiedSupply = supply;
+      idea.finalGap = Math.round((idea.momentum || 50) * (1 - supply / 100) * 10) / 10;
+      await new Promise((r) => setTimeout(r, 150)); // Rate limit YouTube API
+    }
+
+    // Re-sort by FINAL gap score (verified supply)
+    topIdeas.sort((a, b) => (b.finalGap || 0) - (a.finalGap || 0));
+
+    console.log(`Stage 2 complete. Top verified: "${topIdeas[0]?.topic}" (gap: ${topIdeas[0]?.finalGap})`);
+
+    // ========== STEP 3: Save to database ==========
+    console.log('Step 3: Saving opportunities to database...');
     let opportunitiesCreated = 0;
     let topicsUpdated = 0;
 
-    for (const idea of videoIdeas) {
+    for (const idea of topIdeas) {
       try {
-        // Check YouTube supply
-        const { supply, totalResults } = await getYouTubeSupply(idea.topic);
-
-        // Calculate momentum based on source engagement
-        const baseMomentum = Math.min(50, Math.log10(idea.sourceScore + 1) * 25);
-        const commentBonus = Math.min(25, idea.sourceComments / 5);
-        const momentum = Math.min(100, Math.round(baseMomentum + commentBonus));
-
-        // Calculate gap score
-        const gap = Math.round(momentum * (1 - supply / 100) * 10) / 10;
+        const momentum = idea.momentum || 50;
+        const supply = idea.verifiedSupply ?? idea.heuristicSupply ?? 50;
+        const gap = idea.finalGap ?? idea.initialGap ?? 0;
 
         // Determine phase
         const phase =
-          gap >= 70 && supply < 30
+          gap >= 60 && supply < 30
             ? 'innovation'
-            : gap >= 50 && supply < 50
+            : gap >= 45 && supply < 50
             ? 'emergence'
-            : gap >= 35
+            : gap >= 30
             ? 'growth'
-            : gap >= 20
+            : gap >= 15
             ? 'maturity'
             : 'saturated';
 
-        // Determine confidence
+        // Determine confidence (higher if we verified with YouTube)
+        const isVerified = idea.verifiedSupply !== undefined;
         const confidence =
-          momentum >= 60 && supply < 40
+          isVerified && momentum >= 60 && supply < 40
             ? 'high'
-            : momentum >= 40
+            : isVerified && momentum >= 40
             ? 'medium'
             : 'low';
 
@@ -399,12 +510,14 @@ export async function POST() {
               num_comments: idea.sourceComments,
               video_title_suggestion: idea.videoTitle,
               content_type: idea.contentType,
+              heuristic_supply: idea.heuristicSupply,
+              verified_supply: idea.verifiedSupply,
             },
           },
           { onConflict: 'topic_id,source,source_url' }
         );
 
-        // Add signal
+        // Add signal with momentum
         await supabase.from('topic_signals').insert({
           topic_id: topicId,
           momentum_score: momentum,
@@ -412,16 +525,18 @@ export async function POST() {
           hn_total_score: idea.sourcePlatform === 'hackernews' ? idea.sourceScore : null,
         });
 
-        // Upsert opportunity
+        // Get previous gap score for velocity tracking
         const { data: existingOpp } = await supabase
           .from('opportunities')
-          .select('id')
+          .select('id, gap_score')
           .eq('topic_id', topicId)
           .single();
 
+        const previousGap = existingOpp?.gap_score || null;
+
         const oppData = {
           topic_id: topicId,
-          keyword: idea.videoTitle, // Use the AI-generated title as the display keyword
+          keyword: idea.videoTitle,
           category: idea.category,
           external_momentum: momentum,
           youtube_supply: supply,
@@ -434,15 +549,16 @@ export async function POST() {
 
         if (existingOpp) {
           await supabase.from('opportunities').update(oppData).eq('id', existingOpp.id);
+          // Log velocity if score changed significantly
+          if (previousGap !== null && Math.abs(gap - previousGap) > 5) {
+            console.log(`Velocity alert: "${idea.topic}" gap changed ${previousGap} -> ${gap}`);
+          }
         } else {
           await supabase.from('opportunities').insert(oppData);
           opportunitiesCreated++;
         }
 
         topicsUpdated++;
-
-        // Small delay to avoid rate limits
-        await new Promise((r) => setTimeout(r, 100));
       } catch (e) {
         console.error(`Error processing idea ${idea.topic}:`, e);
       }
@@ -467,10 +583,18 @@ export async function POST() {
       success: true,
       stats: {
         posts_collected: allPosts.length,
-        video_ideas: videoIdeas.length,
+        ai_ideas_extracted: videoIdeas.length,
+        youtube_verified: topIdeas.length,
         topics_updated: topicsUpdated,
         opportunities_created: opportunitiesCreated,
         duration_seconds: duration,
+        top_opportunity: topIdeas[0] ? {
+          topic: topIdeas[0].topic,
+          title: topIdeas[0].videoTitle,
+          gap: topIdeas[0].finalGap,
+          supply: topIdeas[0].verifiedSupply,
+          momentum: topIdeas[0].momentum,
+        } : null,
       },
     });
   } catch (error) {
