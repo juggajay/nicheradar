@@ -1,6 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+
+async function getYouTubeStats(query: string): Promise<{
+  totalResults: number;
+  recentCount: number;
+  avgViews: number;
+}> {
+  if (!YOUTUBE_API_KEY) {
+    return { totalResults: 0, recentCount: 0, avgViews: 0 };
+  }
+
+  try {
+    // Search for videos with this keyword
+    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+      query
+    )}&type=video&maxResults=20&order=relevance&key=${YOUTUBE_API_KEY}`;
+
+    const searchRes = await fetch(searchUrl);
+    if (!searchRes.ok) return { totalResults: 0, recentCount: 0, avgViews: 0 };
+
+    const searchData = await searchRes.json();
+    const totalResults = searchData.pageInfo?.totalResults || 0;
+
+    // Count recent videos (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    let recentCount = 0;
+    const videoIds: string[] = [];
+
+    for (const item of searchData.items || []) {
+      const publishedAt = new Date(item.snippet?.publishedAt);
+      if (publishedAt > thirtyDaysAgo) {
+        recentCount++;
+      }
+      videoIds.push(item.id.videoId);
+    }
+
+    // Get video statistics for average views
+    let avgViews = 0;
+    if (videoIds.length > 0) {
+      const statsUrl = `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds.join(
+        ','
+      )}&key=${YOUTUBE_API_KEY}`;
+      const statsRes = await fetch(statsUrl);
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
+        const views = (statsData.items || []).map(
+          (v: { statistics?: { viewCount?: string } }) =>
+            parseInt(v.statistics?.viewCount || '0', 10)
+        );
+        if (views.length > 0) {
+          avgViews = views.reduce((a: number, b: number) => a + b, 0) / views.length;
+        }
+      }
+    }
+
+    return { totalResults, recentCount, avgViews };
+  } catch (e) {
+    console.error('YouTube API error:', e);
+    return { totalResults: 0, recentCount: 0, avgViews: 0 };
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { keyword } = await request.json();
@@ -31,6 +95,7 @@ export async function POST(request: NextRequest) {
         sources: existingOpportunity.sources,
         existing: true,
         opportunity_id: existingOpportunity.id,
+        is_watched: existingOpportunity.is_watched || false,
       });
     }
 
@@ -77,22 +142,39 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // For new keywords, return estimated scores based on typical patterns
-    // In production, this would trigger a real-time YouTube API check
-    const estimatedMomentum = 25; // Base momentum for unknown keywords
-    const estimatedSupply = 50; // Unknown supply
-    const estimatedGap = calculateGapScore(estimatedMomentum, estimatedSupply);
+    // For new keywords, fetch real YouTube data to estimate supply
+    const ytStats = await getYouTubeStats(keyword);
+
+    // Calculate supply based on YouTube data
+    let supply = 30; // Base supply for new keywords
+    if (ytStats.totalResults > 100000) supply = 80;
+    else if (ytStats.totalResults > 50000) supply = 70;
+    else if (ytStats.totalResults > 10000) supply = 60;
+    else if (ytStats.totalResults > 1000) supply = 45;
+    else if (ytStats.totalResults > 100) supply = 30;
+    else supply = 15;
+
+    // Adjust for recent activity
+    if (ytStats.recentCount >= 10) supply += 10;
+    else if (ytStats.recentCount >= 5) supply += 5;
+
+    supply = Math.min(95, supply);
+
+    // Estimate momentum (low for new untracked keywords)
+    const momentum = 20;
+    const gap = calculateGapScore(momentum, supply);
+    const phase = classifyPhase(momentum, supply, gap);
 
     return NextResponse.json({
       keyword: keyword,
-      gap_score: estimatedGap,
-      momentum: estimatedMomentum,
-      supply: estimatedSupply,
-      phase: 'growth',
+      gap_score: gap,
+      momentum: momentum,
+      supply: supply,
+      phase: phase,
       confidence: 'low',
       sources: [],
       existing: false,
-      message: 'This keyword is not yet tracked. Add it to the watchlist to include it in the next scan.',
+      message: `Found ${ytStats.totalResults.toLocaleString()} YouTube videos. Run a scan to track this keyword and get momentum data.`,
     });
   } catch (error) {
     console.error('API error:', error);

@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { GapScore, PhaseBadge, SourceIcons } from '@/components/dashboard';
-import { Search, Loader2, TrendingUp, Eye, Bookmark, ExternalLink, AlertCircle } from 'lucide-react';
+import { Search, Loader2, TrendingUp, Eye, Bookmark, BookmarkCheck, ExternalLink, AlertCircle, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 
 interface AnalysisResult {
@@ -21,6 +21,7 @@ interface AnalysisResult {
   opportunity_id?: string;
   topic_id?: string;
   message?: string;
+  is_watched?: boolean;
 }
 
 export default function AnalysePage() {
@@ -28,6 +29,32 @@ export default function AnalysePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isWatched, setIsWatched] = useState(false);
+  const [watchLoading, setWatchLoading] = useState(false);
+
+  const handleToggleWatch = async () => {
+    if (!result?.opportunity_id) return;
+
+    setWatchLoading(true);
+    try {
+      const response = await fetch('/api/watchlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          opportunity_id: result.opportunity_id,
+          is_watched: !isWatched,
+        }),
+      });
+
+      if (response.ok) {
+        setIsWatched(!isWatched);
+      }
+    } catch (err) {
+      console.error('Failed to update watchlist:', err);
+    } finally {
+      setWatchLoading(false);
+    }
+  };
 
   const handleAnalyse = async () => {
     if (!keyword.trim()) return;
@@ -49,6 +76,7 @@ export default function AnalysePage() {
 
       const data = await response.json();
       setResult(data);
+      setIsWatched(data.is_watched || false);
     } catch (err) {
       setError('Failed to analyse keyword. Please try again.');
       console.error(err);
@@ -132,10 +160,24 @@ export default function AnalysePage() {
                     </Button>
                   </Link>
                 )}
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Bookmark className="h-4 w-4" />
-                  Add to Watchlist
-                </Button>
+                {result.opportunity_id && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`gap-2 ${isWatched ? 'border-emerald-500 text-emerald-400' : ''}`}
+                    onClick={handleToggleWatch}
+                    disabled={watchLoading}
+                  >
+                    {watchLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : isWatched ? (
+                      <BookmarkCheck className="h-4 w-4" />
+                    ) : (
+                      <Bookmark className="h-4 w-4" />
+                    )}
+                    {isWatched ? 'Watching' : 'Add to Watchlist'}
+                  </Button>
+                )}
               </div>
             </div>
 
