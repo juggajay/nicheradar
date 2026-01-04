@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface TrendChartProps {
@@ -7,6 +8,12 @@ interface TrendChartProps {
 }
 
 export function TrendChart({ data }: TrendChartProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Guard against empty data
   if (!data || data.length === 0) {
     return (
@@ -16,9 +23,18 @@ export function TrendChart({ data }: TrendChartProps) {
     );
   }
 
+  // Prevent SSR rendering of ResponsiveContainer (causes width/height -1 error)
+  if (!mounted) {
+    return (
+      <div className="h-64 w-full flex items-center justify-center text-slate-500">
+        Loading chart...
+      </div>
+    );
+  }
+
   return (
-    <div className="h-64 w-full min-h-[256px]">
-      <ResponsiveContainer width="100%" height="100%" minHeight={256}>
+    <div className="h-64 w-full" style={{ minHeight: '256px' }}>
+      <ResponsiveContainer width="100%" height={256}>
         <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="momentumGradient" x1="0" y1="0" x2="0" y2="1">

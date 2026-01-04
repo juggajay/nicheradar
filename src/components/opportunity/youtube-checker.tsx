@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, RefreshCw, Youtube, ExternalLink, Users, Eye, Calendar } from 'lucide-react';
+import { Loader2, RefreshCw, Youtube, ExternalLink, Eye, Calendar, TrendingUp, TrendingDown, Minus, HelpCircle } from 'lucide-react';
 
 interface YouTubeVideo {
   video_id: string;
@@ -19,6 +19,12 @@ interface YouTubeData {
   large_channel_count: number;
   small_channel_count: number;
   top_videos: YouTubeVideo[];
+}
+
+interface TrendsData {
+  status: 'success' | 'insufficient_data' | 'error' | 'unavailable';
+  direction: 'spiking' | 'growing' | 'stable' | 'dropping' | 'unknown';
+  sparkline: number[];
 }
 
 interface YouTubeCheckerProps {
@@ -60,6 +66,7 @@ export function YouTubeChecker({ opportunityId, keyword, initialData }: YouTubeC
       : null
   );
   const [supply, setSupply] = useState<number | null>(null);
+  const [trends, setTrends] = useState<TrendsData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleCheck = async () => {
@@ -80,9 +87,9 @@ export function YouTubeChecker({ opportunityId, keyword, initialData }: YouTubeC
       }
       setData(result.data);
       setSupply(result.supply);
-
-      // Reload page to show updated scores
-      setTimeout(() => window.location.reload(), 1500);
+      if (result.trends) {
+        setTrends(result.trends);
+      }
     } catch (err) {
       setError('Failed to check YouTube. Please try again.');
       console.error(err);
@@ -95,6 +102,67 @@ export function YouTubeChecker({ opportunityId, keyword, initialData }: YouTubeC
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
     if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
     return num.toString();
+  };
+
+  const getTrendBadge = () => {
+    if (!trends || trends.status !== 'success') {
+      return null;
+    }
+
+    const config = {
+      spiking: { icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-500/10', label: 'Spiking' },
+      growing: { icon: TrendingUp, color: 'text-green-400', bg: 'bg-green-500/10', label: 'Growing' },
+      stable: { icon: Minus, color: 'text-slate-400', bg: 'bg-slate-500/10', label: 'Stable' },
+      dropping: { icon: TrendingDown, color: 'text-red-400', bg: 'bg-red-500/10', label: 'Dropping' },
+      unknown: { icon: HelpCircle, color: 'text-slate-500', bg: 'bg-slate-500/10', label: 'Unknown' },
+    };
+
+    const { icon: Icon, color, bg, label } = config[trends.direction];
+
+    return (
+      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${bg}`}>
+        <Icon className={`h-3.5 w-3.5 ${color}`} />
+        <span className={`text-xs font-medium ${color}`}>{label}</span>
+      </div>
+    );
+  };
+
+  const renderSparkline = () => {
+    if (!trends || !trends.sparkline || trends.sparkline.length < 2) return null;
+
+    const data = trends.sparkline;
+    const max = Math.max(...data);
+    const min = Math.min(...data);
+    const range = max - min || 1;
+
+    // Create SVG path
+    const width = 80;
+    const height = 24;
+    const points = data.map((val, i) => {
+      const x = (i / (data.length - 1)) * width;
+      const y = height - ((val - min) / range) * height;
+      return `${x},${y}`;
+    });
+
+    const pathD = `M${points.join(' L')}`;
+
+    return (
+      <svg width={width} height={height} className="inline-block ml-2">
+        <path
+          d={pathD}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          className={
+            trends.direction === 'spiking' || trends.direction === 'growing'
+              ? 'text-emerald-400'
+              : trends.direction === 'dropping'
+              ? 'text-red-400'
+              : 'text-slate-400'
+          }
+        />
+      </svg>
+    );
   };
 
   // No data yet - show check button
@@ -162,11 +230,25 @@ export function YouTubeChecker({ opportunityId, keyword, initialData }: YouTubeC
         </Button>
       </div>
 
-      {supply !== null && (
-        <div className="rounded-lg bg-slate-800/50 p-3 text-center">
-          <p className="text-sm text-slate-400">
-            Verified Supply Score: <span className="font-bold text-white">{supply}</span>
-          </p>
+      {(supply !== null || trends) && (
+        <div className="rounded-lg bg-slate-800/50 p-3">
+          <div className="flex items-center justify-center gap-6">
+            {supply !== null && (
+              <p className="text-sm text-slate-400">
+                Supply Score: <span className="font-bold text-white">{supply}</span>
+              </p>
+            )}
+            {trends && trends.status === 'success' && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-slate-400">Google Trend:</span>
+                {getTrendBadge()}
+                {renderSparkline()}
+              </div>
+            )}
+            {trends && trends.status === 'error' && (
+              <p className="text-xs text-slate-500">Trend data unavailable</p>
+            )}
+          </div>
         </div>
       )}
 

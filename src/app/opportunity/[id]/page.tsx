@@ -89,17 +89,14 @@ export default async function OpportunityPage({ params }: PageProps) {
   const youtubeData = youtubeSupply ? {
     total_results: youtubeSupply.total_results || 0,
     results_last_7_days: youtubeSupply.results_last_7_days || 0,
-    results_last_30_days: youtubeSupply.results_last_30_days || 0,
-    avg_channel_subscribers: youtubeSupply.avg_channel_subscribers || 0,
     large_channel_count: youtubeSupply.large_channel_count || 0,
     small_channel_count: youtubeSupply.small_channel_count || 0,
     top_results: (youtubeSupply.top_results || []).slice(0, 5).map((v: Record<string, unknown>) => ({
-      video_id: v.video_id,
-      title: v.title,
-      channel_name: 'Channel',
-      channel_subscribers: v.subs,
-      views: v.views,
-      published_at: `${v.age_days} days ago`,
+      video_id: v.video_id as string,
+      title: v.title as string,
+      channel_name: (v.channel_name as string) || 'Channel',
+      views: (v.views as number) || 0,
+      published_at: v.published_at as string,
     })),
   } : null;
 

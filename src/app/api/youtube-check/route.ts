@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getTrendHealth, TrendResult } from '@/lib/trends';
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
@@ -219,8 +220,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No keyword found' }, { status: 400 });
     }
 
-    // Fetch fresh YouTube data
-    const ytData = await fetchYouTubeData(searchQuery);
+    // Fetch YouTube data and Google Trends in parallel
+    const [ytData, trendData] = await Promise.all([
+      fetchYouTubeData(searchQuery),
+      getTrendHealth(searchQuery).catch((): TrendResult => ({
+        status: 'unavailable',
+        trend: 'unknown',
+      })),
+    ]);
+
     const supply = calculateSupplyScore(ytData);
 
     // Update youtube_supply table if we have a topic
@@ -286,6 +294,11 @@ export async function POST(request: NextRequest) {
         large_channel_count: ytData.largeChannelCount,
         small_channel_count: ytData.smallChannelCount,
         top_videos: ytData.videos.slice(0, 5),
+      },
+      trends: {
+        status: trendData.status,
+        direction: trendData.trend,
+        sparkline: trendData.sparkline || [],
       },
     });
   } catch (error) {
