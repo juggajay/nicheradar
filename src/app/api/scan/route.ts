@@ -88,45 +88,128 @@ async function fetchHNStories(limit = 50) {
   return stories;
 }
 
+// Common words to filter out - these appear in titles but aren't useful topics
+const STOP_WORDS = new Set([
+  // Basic English
+  'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with',
+  'by', 'from', 'as', 'is', 'was', 'are', 'were', 'been', 'be', 'have', 'has', 'had',
+  'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must',
+  'shall', 'can', 'need', 'dare', 'ought', 'used', 'it', 'its', 'this', 'that',
+  'these', 'those', 'i', 'you', 'he', 'she', 'we', 'they', 'what', 'which', 'who',
+  'whom', 'whose', 'where', 'when', 'why', 'how', 'all', 'each', 'every', 'both',
+  'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own',
+  'same', 'so', 'than', 'too', 'very', 'just', 'also', 'now', 'here', 'there',
+  'about', 'after', 'before', 'above', 'below', 'between', 'under', 'again',
+  'further', 'then', 'once', 'during', 'while', 'through', 'into', 'over',
+  'your', 'my', 'his', 'her', 'our', 'their', 'me', 'him', 'us', 'them',
+  // Common verbs
+  'get', 'got', 'getting', 'make', 'made', 'making', 'take', 'took', 'taking',
+  'come', 'came', 'coming', 'go', 'went', 'going', 'know', 'knew', 'known',
+  'think', 'thought', 'see', 'saw', 'seen', 'want', 'use', 'find', 'give',
+  'tell', 'ask', 'work', 'seem', 'feel', 'try', 'leave', 'call', 'keep',
+  'let', 'begin', 'show', 'hear', 'play', 'run', 'move', 'live', 'believe',
+  'build', 'built', 'using', 'write', 'wrote', 'read', 'learn', 'learning',
+  // Generic adjectives/nouns
+  'total', 'new', 'old', 'big', 'small', 'large', 'great', 'good', 'bad',
+  'first', 'last', 'long', 'little', 'much', 'many', 'lot', 'way', 'thing',
+  'man', 'woman', 'child', 'world', 'life', 'hand', 'part', 'place', 'case',
+  'week', 'company', 'system', 'program', 'question', 'government', 'number',
+  'night', 'point', 'home', 'water', 'room', 'mother', 'area', 'money',
+  'story', 'fact', 'month', 'different', 'kind', 'head', 'far', 'black',
+  'white', 'real', 'back', 'yet', 'ago', 'done', 'best', 'years', 'year',
+  'days', 'day', 'time', 'times', 'people', 'person', 'something', 'anything',
+  'everything', 'nothing', 'someone', 'anyone', 'everyone', 'always', 'never',
+  // Platform/meta words (not topics themselves)
+  'blog', 'blogs', 'post', 'posts', 'article', 'articles', 'news', 'update',
+  'updates', 'hacker', 'reddit', 'popular', 'being', 'today', 'yesterday',
+  'thread', 'comment', 'comments', 'discussion', 'link', 'links', 'site',
+  'website', 'page', 'source', 'sources', 'release', 'released', 'announces',
+  'announced', 'launches', 'launched', 'introduces', 'introduced', 'reveals',
+  // Generic tech words (too broad to be useful)
+  'code', 'software', 'developer', 'developers', 'programming', 'tech',
+  'technology', 'app', 'apps', 'application', 'startup', 'startups',
+  'project', 'projects', 'tool', 'tools', 'library', 'framework',
+  'open', 'free', 'simple', 'easy', 'hard', 'fast', 'slow', 'better',
+  'worse', 'features', 'feature', 'users', 'user', 'data', 'file', 'files',
+]);
+
 function extractKeywords(text: string): string[] {
   if (!text) return [];
 
   // Remove common prefixes
   let cleaned = text.replace(
-    /^(TIL|ELI5|CMV|TIFU|AMA|WIBTA|AITA|Show HN|Ask HN|Tell HN|Launch HN)\s*:?\s*/i,
+    /^(TIL|ELI5|CMV|TIFU|AMA|WIBTA|AITA|Show HN|Ask HN|Tell HN|Launch HN)\s*[-:–]?\s*/i,
     ''
   );
 
   const keywords: string[] = [];
 
-  // Find quoted terms
+  // 1. Find quoted terms (highest priority - explicit topic names)
   const quoted = cleaned.match(/"([^"]+)"/g);
   if (quoted) {
     keywords.push(...quoted.map((q) => q.replace(/"/g, '')));
   }
 
-  // Find capitalized phrases
-  const phrases = cleaned.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})\b/g);
-  if (phrases) {
-    keywords.push(...phrases);
+  // 2. Find well-known tech patterns with version numbers
+  // Examples: "GPT-4o", "Claude 3.5", "React 19", "Python 3.12", "iOS 18"
+  const versionedTech = cleaned.match(/\b(?:GPT|Claude|Gemini|Llama|Mistral|React|Vue|Angular|Node|Python|Ruby|PHP|Java|Swift|Kotlin|Rust|Go|TypeScript|JavaScript|iOS|Android|macOS|Windows|Linux|Docker|Kubernetes|AWS|GCP|Azure|Next|Nuxt|Svelte|Tailwind|PostgreSQL|MongoDB|Redis|GraphQL|REST|API|SDK|CLI|LLM|RAG|ML|AI)(?:[-.\s]?\d+(?:\.\d+)?[a-z]?)?\b/gi);
+  if (versionedTech) {
+    keywords.push(...versionedTech);
   }
 
-  // Use whole title if short
-  const words = cleaned.replace(/[^\w\s]/g, '').trim().split(/\s+/);
-  if (words.length >= 3 && words.length <= 6) {
-    keywords.push(cleaned.replace(/[^\w\s]/g, '').trim());
+  // 3. Find product/company names (PascalCase or with numbers)
+  // Examples: "ChatGPT", "OpenAI", "Anthropic", "GitHub", "Vercel", "Supabase"
+  const productNames = cleaned.match(/\b[A-Z][a-z]+(?:[A-Z][a-z]+)+\b/g);
+  if (productNames) {
+    keywords.push(...productNames.filter(p =>
+      p.length > 4 &&
+      !['The', 'This', 'That', 'What', 'When', 'Where', 'Why', 'How', 'Who'].some(w => p.startsWith(w))
+    ));
   }
 
-  // Normalize and dedupe
+  // 4. Find ALL CAPS acronyms (3-6 letters) - often tech terms
+  // Examples: "API", "LLM", "RAG", "CUDA", "WASM", "HTMX"
+  const acronyms = cleaned.match(/\b[A-Z]{3,6}\b/g);
+  if (acronyms) {
+    const goodAcronyms = acronyms.filter(a =>
+      !['TIL', 'ELI', 'CMV', 'AMA', 'PSA', 'IMO', 'TBH', 'FYI', 'IIRC', 'AFAIK', 'THE', 'AND', 'FOR', 'BUT', 'NOT'].includes(a)
+    );
+    keywords.push(...goodAcronyms);
+  }
+
+  // 5. Find "X vs Y" comparisons (great for content gaps)
+  const vsPattern = cleaned.match(/\b([A-Z][a-zA-Z0-9]*)\s+vs\.?\s+([A-Z][a-zA-Z0-9]*)\b/gi);
+  if (vsPattern) {
+    keywords.push(...vsPattern);
+  }
+
+  // 6. Find specific phrases like "X for Y" or "how to X"
+  const forPattern = cleaned.match(/\b([A-Z][a-zA-Z0-9]+)\s+for\s+([a-zA-Z]+(?:\s+[a-zA-Z]+)?)\b/gi);
+  if (forPattern) {
+    keywords.push(...forPattern.filter(p => p.length > 10));
+  }
+
+  // Normalize, filter junk, and dedupe
   const seen = new Set<string>();
   return keywords
-    .map((k) => k.toLowerCase().trim())
+    .map((k) => k.trim())
     .filter((k) => {
-      if (k.length <= 3 || seen.has(k) || /^\d+$/.test(k)) return false;
-      seen.add(k);
+      const lower = k.toLowerCase();
+      // Filter out very short keywords
+      if (k.length <= 2) return false;
+      // Allow 3-letter acronyms if uppercase
+      if (k.length === 3 && k !== k.toUpperCase()) return false;
+      if (seen.has(lower)) return false;
+      if (/^\d+$/.test(k)) return false;
+      // Check if all words are stop words
+      const words = lower.split(/\s+/);
+      if (words.every(w => STOP_WORDS.has(w))) return false;
+      // Filter single stop words
+      if (words.length === 1 && STOP_WORDS.has(lower)) return false;
+      seen.add(lower);
       return true;
     })
-    .slice(0, 3);
+    .slice(0, 3); // Take top 3 keywords per item
 }
 
 export async function POST() {
@@ -276,19 +359,49 @@ export async function POST() {
         // Calculate scores
         let redditScore = 0;
         let hnScore = 0;
+        let redditComments = 0;
+        let hnComments = 0;
 
         for (const s of topicData.sources) {
           const meta = s.source_metadata as Record<string, number>;
-          if (s.source === 'reddit') redditScore += meta.score || 0;
-          if (s.source === 'hackernews') hnScore += meta.score || 0;
+          if (s.source === 'reddit') {
+            redditScore += meta.score || 0;
+            redditComments += meta.num_comments || 0;
+          }
+          if (s.source === 'hackernews') {
+            hnScore += meta.score || 0;
+            hnComments += meta.num_comments || 0;
+          }
         }
 
-        const momentum = Math.min(
-          100,
-          (Math.min(redditScore / 500, 1) * 40) + (Math.min(hnScore / 300, 1) * 30)
-        );
-        const supply = 50; // Default until YouTube check
-        const gap = momentum * (1 - supply / 100);
+        // Better momentum calculation using log scale
+        // HN: 50 points = decent, 200+ = viral
+        // Reddit: 100 points = decent, 500+ = viral
+        const hnMomentum = hnScore > 0 ? Math.min(50, Math.log10(hnScore + 1) * 22) : 0;
+        const redditMomentum = redditScore > 0 ? Math.min(50, Math.log10(redditScore + 1) * 18) : 0;
+
+        // Bonus for engagement (comments)
+        const engagementBonus = Math.min(20, (hnComments + redditComments) / 10);
+
+        // Bonus for multiple sources
+        const sourceCount = new Set(topicData.sources.map((s) => s.source)).size;
+        const sourceBonus = sourceCount >= 2 ? 15 : 0;
+
+        const momentum = Math.min(100, hnMomentum + redditMomentum + engagementBonus + sourceBonus);
+
+        // Estimate supply based on keyword characteristics
+        // Long-tail keywords typically have lower supply
+        const wordCount = topicData.keyword.split(/\s+/).length;
+        const hasNumbers = /\d/.test(topicData.keyword);
+        const isLongTail = wordCount >= 3;
+
+        let supply = 60; // Default medium-high
+        if (isLongTail) supply -= 20;
+        if (hasNumbers) supply -= 10;
+        if (wordCount >= 4) supply -= 10;
+        supply = Math.max(10, Math.min(90, supply));
+
+        const gap = Math.round(momentum * (1 - supply / 100) * 10) / 10;
 
         // Store signal
         await supabase.from('topic_signals').insert({
@@ -310,7 +423,6 @@ export async function POST() {
             ? 'maturity'
             : 'saturated';
 
-        const sourceCount = new Set(topicData.sources.map((s) => s.source)).size;
         const confidence =
           sourceCount >= 3 && momentum >= 70
             ? 'high'
