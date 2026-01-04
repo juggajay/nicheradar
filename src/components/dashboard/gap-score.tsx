@@ -2,10 +2,15 @@ import { cn } from '@/lib/utils';
 
 interface GapScoreProps {
   score: number;
+  scoreV2?: number | null;
   size?: 'sm' | 'md' | 'lg';
+  showComparison?: boolean;
 }
 
-export function GapScore({ score, size = 'md' }: GapScoreProps) {
+export function GapScore({ score, scoreV2, size = 'md', showComparison = false }: GapScoreProps) {
+  // Use V2 score if available, otherwise fall back to V1
+  const displayScore = scoreV2 ?? score;
+
   const getColor = (score: number) => {
     if (score >= 80) return 'from-emerald-400 to-green-500 text-emerald-400';
     if (score >= 60) return 'from-yellow-400 to-amber-500 text-yellow-400';
@@ -21,10 +26,23 @@ export function GapScore({ score, size = 'md' }: GapScoreProps) {
 
   return (
     <div className="flex flex-col items-center">
-      <span className={cn('bg-gradient-to-r bg-clip-text text-transparent', getColor(score), sizeClasses[size])}>
-        {score.toFixed(0)}
+      <div className="flex items-baseline gap-2">
+        <span
+          className={cn(
+            'bg-gradient-to-r bg-clip-text text-transparent',
+            getColor(displayScore),
+            sizeClasses[size]
+          )}
+        >
+          {displayScore.toFixed(0)}
+        </span>
+        {showComparison && scoreV2 !== null && scoreV2 !== undefined && (
+          <span className="text-xs text-slate-500">(v1: {Math.round(score)})</span>
+        )}
+      </div>
+      <span className="text-xs text-slate-500">
+        Gap Score{scoreV2 !== null && scoreV2 !== undefined ? ' v2' : ''}
       </span>
-      <span className="text-xs text-slate-500">Gap Score</span>
     </div>
   );
 }

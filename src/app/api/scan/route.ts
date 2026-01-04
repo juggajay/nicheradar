@@ -1,5 +1,16 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import {
+  calculateRecencyMultiplier,
+  normalizeTopic,
+  detectCrossPlatform,
+  getCrossPlatformMultiplier,
+  calculateCrossPlatformStrength,
+  calculateVelocity,
+  getVelocityMultiplier,
+  getNewTopicBonus,
+  CollectedPost,
+} from '@/lib/scoring-v2';
 
 const SUBREDDITS = [
   { subreddit: 'technology', category: 'tech', min_score: 50 },
@@ -326,8 +337,8 @@ function estimateHeuristicSupply(topic: string, contentType: string): number {
   return Math.max(10, Math.min(100, supply));
 }
 
-// Calculate momentum with RECENCY DECAY
-// Fresh posts get boosted, stale posts get penalized
+// Calculate momentum with RECENCY DECAY (V2: Plateau-based)
+// Fresh posts get boosted, proven posts (still trending after 24h) are rewarded
 function calculateMomentumWithRecency(
   score: number,
   comments: number,
@@ -337,13 +348,10 @@ function calculateMomentumWithRecency(
   const baseMomentum = Math.min(50, Math.log10(score + 1) * 25);
   const commentBonus = Math.min(25, comments / 5);
 
-  // Recency decay: 1 / sqrt(hours_since_post)
+  // V2: Plateau-based recency decay (imported from scoring-v2)
   const nowSeconds = Date.now() / 1000;
   const hoursSincePost = Math.max(0.5, (nowSeconds - createdAt) / 3600);
-
-  // Fresh posts (< 2 hours) get up to 1.4x boost
-  // Old posts (> 24 hours) get penalized down to 0.5x
-  const recencyMultiplier = Math.min(1.4, 1 / Math.sqrt(hoursSincePost / 2));
+  const recencyMultiplier = calculateRecencyMultiplier(hoursSincePost);
 
   const momentum = Math.round((baseMomentum + commentBonus) * recencyMultiplier);
   return Math.min(100, Math.max(10, momentum));
@@ -666,27 +674,61 @@ export async function POST() {
           { onConflict: 'topic_id,source,source_url' }
         );
 
-        // Add signal with momentum
+        // Build cross-platform data for this topic
+        // Note: Cross-platform detection happens at the topic level across all ideas
+        const topicPlatforms = videoIdeas
+          .filter(i => normalizeTopic(i.topic) === normalizeTopic(idea.topic))
+          .map(i => i.sourcePlatform);
+        const uniquePlatforms = [...new Set(topicPlatforms)];
+        const crossPlatformCount = uniquePlatforms.length;
+
+        // Add signal with momentum and cross-platform data
         await supabase.from('topic_signals').insert({
           topic_id: topicId,
           momentum_score: momentum,
           reddit_total_score: idea.sourcePlatform === 'reddit' ? idea.sourceScore : null,
           hn_total_score: idea.sourcePlatform === 'hackernews' ? idea.sourceScore : null,
+          // V2 cross-platform fields
+          source_platforms: uniquePlatforms,
+          cross_platform_count: crossPlatformCount,
         });
 
-        // Get previous gap score for velocity tracking
+        // Get previous opportunity data for velocity tracking
         const { data: existingOpp } = await supabase
           .from('opportunities')
           .select('id, gap_score')
           .eq('topic_id', topicId)
           .single();
 
+        // Get topic first_seen_at for new topic bonus
+        const { data: topicData } = await supabase
+          .from('topics')
+          .select('first_seen_at')
+          .eq('id', topicId)
+          .single();
+
         const previousGap = existingOpp?.gap_score || null;
+
+        // V2: Apply cross-platform boost to momentum
+        const crossPlatformMultiplier = getCrossPlatformMultiplier(crossPlatformCount);
+        const momentumV2 = Math.min(150, momentum * crossPlatformMultiplier);
+
+        // V2: Calculate velocity from historical data
+        const velocityResult = await calculateVelocity(topicId, momentumV2, supabase);
+
+        // V2: Calculate gap score with velocity and new topic bonus
+        // Note: Full V2 gap calculation happens in youtube-check when supply is verified
+        // Here we store preliminary V2 values
+        const velocityMultiplier = getVelocityMultiplier(velocityResult.trend);
+        const newTopicBonus = getNewTopicBonus(topicData?.first_seen_at || new Date().toISOString());
+        const baseGapV2 = momentumV2 * (1 - supply / 100);
+        const gapScoreV2 = Math.round(baseGapV2 * velocityMultiplier * newTopicBonus * 10) / 10;
 
         const oppData = {
           topic_id: topicId,
           keyword: idea.topic,
           category: idea.category,
+          // V1 fields (unchanged)
           external_momentum: momentum,
           youtube_supply: supply,
           gap_score: gap,
@@ -694,6 +736,13 @@ export async function POST() {
           confidence,
           sources: [idea.sourcePlatform],
           calculated_at: new Date().toISOString(),
+          // V2 fields
+          external_momentum_v2: momentumV2,
+          gap_score_v2: gapScoreV2,
+          velocity_24h: velocityResult.velocity24h,
+          velocity_7d: velocityResult.velocity7d,
+          velocity_trend: velocityResult.trend,
+          cross_platform_count: crossPlatformCount,
         };
 
         if (existingOpp) {
