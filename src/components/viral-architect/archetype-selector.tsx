@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sparkles, ChevronDown, Check, Zap, Film, Microscope, Trophy, Users } from 'lucide-react';
+import { Sparkles, ChevronDown, Check, Zap, Film, Microscope, Trophy, Users, EyeOff } from 'lucide-react';
 
 interface Archetype {
   key: string;
@@ -31,16 +31,25 @@ export function ArchetypeSelector({ onSelect, selectedId }: ArchetypeSelectorPro
   const [archetypes, setArchetypes] = useState<Archetype[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [facelessOnly, setFacelessOnly] = useState(true); // Default to faceless
 
   useEffect(() => {
     fetch('/api/generate-blueprint')
       .then(res => res.json())
       .then(data => {
-        setArchetypes(data.archetypes || []);
+        // Sort by faceless score (highest first)
+        const sorted = (data.archetypes || []).sort(
+          (a: Archetype, b: Archetype) => (b.faceless_score || 0) - (a.faceless_score || 0)
+        );
+        setArchetypes(sorted);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
+
+  const filteredArchetypes = facelessOnly
+    ? archetypes.filter(a => (a.faceless_score || 0) >= 6)
+    : archetypes;
 
   const selected = archetypes.find(a => a.id === selectedId);
 
@@ -54,6 +63,12 @@ export function ArchetypeSelector({ onSelect, selectedId }: ArchetypeSelectorPro
     }
   };
 
+  const getFacelessColor = (score: number) => {
+    if (score >= 8) return 'text-emerald-400';
+    if (score >= 6) return 'text-yellow-400';
+    return 'text-slate-500';
+  };
+
   if (loading) {
     return (
       <div className="animate-pulse bg-slate-800 rounded-lg h-12 w-full" />
@@ -62,6 +77,24 @@ export function ArchetypeSelector({ onSelect, selectedId }: ArchetypeSelectorPro
 
   return (
     <div className="relative">
+      {/* Faceless Filter Toggle */}
+      <div className="flex items-center justify-between mb-2">
+        <button
+          onClick={() => setFacelessOnly(!facelessOnly)}
+          className={`flex items-center gap-2 text-xs px-2 py-1 rounded transition-colors ${
+            facelessOnly
+              ? 'bg-violet-500/20 text-violet-400'
+              : 'bg-slate-800 text-slate-500 hover:text-slate-400'
+          }`}
+        >
+          <EyeOff className="h-3 w-3" />
+          Faceless Only
+        </button>
+        <span className="text-xs text-slate-500">
+          {filteredArchetypes.length} archetypes
+        </span>
+      </div>
+
       <Button
         variant="outline"
         onClick={() => setIsOpen(!isOpen)}
@@ -80,7 +113,7 @@ export function ArchetypeSelector({ onSelect, selectedId }: ArchetypeSelectorPro
 
       {isOpen && (
         <div className="absolute z-[100] mt-2 w-full max-h-[400px] overflow-y-auto rounded-lg border border-slate-700 bg-slate-900 shadow-xl">
-          {archetypes.map((archetype) => (
+          {filteredArchetypes.map((archetype) => (
             <button
               key={archetype.id}
               onClick={() => {
@@ -102,7 +135,11 @@ export function ArchetypeSelector({ onSelect, selectedId }: ArchetypeSelectorPro
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
+                <span className={`text-xs ${getFacelessColor(archetype.faceless_score || 0)}`}>
+                  <EyeOff className="h-3 w-3 inline mr-1" />
+                  {archetype.faceless_score || 0}/10
+                </span>
                 <span className={`text-xs ${getDifficultyColor(archetype.difficulty)}`}>
                   {archetype.difficulty}
                 </span>
