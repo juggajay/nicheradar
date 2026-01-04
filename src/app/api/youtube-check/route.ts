@@ -47,7 +47,9 @@ async function fetchYouTubeData(query: string): Promise<{
 
   const searchRes = await fetch(searchUrl);
   if (!searchRes.ok) {
-    throw new Error('YouTube search failed');
+    const errorText = await searchRes.text();
+    console.error('YouTube API error:', searchRes.status, errorText);
+    throw new Error(`YouTube search failed: ${searchRes.status} - ${errorText.slice(0, 200)}`);
   }
 
   const searchData = await searchRes.json();
@@ -369,8 +371,22 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('YouTube check error:', error);
+    const errorMessage = String(error);
+
+    // Handle quota exceeded gracefully
+    if (errorMessage.includes('quotaExceeded') || errorMessage.includes('403')) {
+      return NextResponse.json(
+        {
+          error: 'YouTube API quota exceeded',
+          details: 'Daily quota limit reached. Try again tomorrow or use cached data.',
+          retryable: true
+        },
+        { status: 429 }
+      );
+    }
+
     return NextResponse.json(
-      { error: 'YouTube check failed', details: String(error) },
+      { error: 'YouTube check failed', details: errorMessage },
       { status: 500 }
     );
   }
