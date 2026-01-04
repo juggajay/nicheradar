@@ -1,5 +1,5 @@
 import { FadeIn } from '@/components/motion';
-import { StatsBar } from '@/components/dashboard';
+import { StatsBar, ScanButton } from '@/components/dashboard';
 import { OpportunityCard } from '@/components/dashboard';
 import { createClient } from '@/lib/supabase/server';
 import type { Opportunity } from '@/types/database';
@@ -82,9 +82,12 @@ export default async function DashboardPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <FadeIn>
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Opportunity Radar</h1>
-          <p className="text-slate-400">Trending topics with low YouTube competition</p>
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Opportunity Radar</h1>
+            <p className="text-slate-400">Trending topics with low YouTube competition</p>
+          </div>
+          <ScanButton />
         </div>
       </FadeIn>
 

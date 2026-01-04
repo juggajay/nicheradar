@@ -1,11 +1,10 @@
 import { FadeIn, SlideIn } from '@/components/motion';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { PhaseBadge, GapScore, SourceIcons } from '@/components/dashboard';
+import { PhaseBadge, GapScore, SourceIcons, WatchButton } from '@/components/dashboard';
 import { TrendChart } from '@/components/charts/trend-chart';
 import { YouTubeResults } from '@/components/opportunity/youtube-results';
 import { SourceLinks } from '@/components/opportunity/source-links';
-import { ArrowLeft, Bookmark, TrendingUp, Eye, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Eye, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
@@ -128,10 +127,11 @@ export default async function OpportunityPage({ params }: PageProps) {
                     <SourceIcons sources={opportunity.sources || []} />
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Bookmark className="h-4 w-4" />
-                  {opportunity.is_watched ? 'Watching' : 'Watch'}
-                </Button>
+                <WatchButton
+                  opportunityId={opportunity.id}
+                  initialWatched={opportunity.is_watched}
+                  variant="full"
+                />
               </div>
 
               <div className="grid grid-cols-3 gap-4 mb-6">

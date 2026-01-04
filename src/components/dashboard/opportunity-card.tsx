@@ -6,8 +6,8 @@ import { Card } from '@/components/ui/card';
 import { PhaseBadge } from './phase-badge';
 import { SourceIcons } from './source-icons';
 import { GapScore } from './gap-score';
-import { TrendingUp, Eye, Bookmark } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { WatchButton } from './watch-button';
+import { TrendingUp, Eye } from 'lucide-react';
 import type { Opportunity } from '@/types/database';
 
 interface OpportunityCardProps {
@@ -38,11 +38,11 @@ export function OpportunityCard({ opportunity, index = 0 }: OpportunityCardProps
               <div className="flex items-center gap-4 text-sm text-slate-400">
                 <div className="flex items-center gap-1.5">
                   <TrendingUp className="h-4 w-4 text-emerald-400" />
-                  <span>Momentum: {opportunity.external_momentum.toFixed(0)}</span>
+                  <span>Momentum: {Math.round(opportunity.external_momentum)}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Eye className="h-4 w-4 text-blue-400" />
-                  <span>Supply: {opportunity.youtube_supply.toFixed(0)}</span>
+                  <span>Supply: {Math.round(opportunity.youtube_supply)}</span>
                 </div>
               </div>
 
@@ -51,9 +51,11 @@ export function OpportunityCard({ opportunity, index = 0 }: OpportunityCardProps
 
             <div className="flex flex-col items-end gap-2">
               <GapScore score={opportunity.gap_score} />
-              {opportunity.is_watched && (
-                <Bookmark className="h-4 w-4 text-violet-400 fill-violet-400" />
-              )}
+              <WatchButton
+                opportunityId={opportunity.id}
+                initialWatched={opportunity.is_watched}
+                variant="icon"
+              />
             </div>
           </div>
 
