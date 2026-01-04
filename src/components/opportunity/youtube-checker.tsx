@@ -73,11 +73,11 @@ export function YouTubeChecker({ opportunityId, keyword, initialData }: YouTubeC
         body: JSON.stringify({ opportunity_id: opportunityId, keyword }),
       });
 
-      if (!response.ok) {
-        throw new Error('YouTube check failed');
-      }
-
       const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.details || result.error || 'YouTube check failed');
+      }
       setData(result.data);
       setSupply(result.supply);
 

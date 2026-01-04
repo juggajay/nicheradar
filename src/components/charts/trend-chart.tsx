@@ -7,9 +7,18 @@ interface TrendChartProps {
 }
 
 export function TrendChart({ data }: TrendChartProps) {
+  // Guard against empty data
+  if (!data || data.length === 0) {
+    return (
+      <div className="h-64 flex items-center justify-center text-slate-500">
+        No trend data available
+      </div>
+    );
+  }
+
   return (
-    <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-64 w-full min-h-[256px]">
+      <ResponsiveContainer width="100%" height="100%" minHeight={256}>
         <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="momentumGradient" x1="0" y1="0" x2="0" y2="1">

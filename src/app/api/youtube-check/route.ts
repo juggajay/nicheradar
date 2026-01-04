@@ -179,7 +179,16 @@ function calculateSupplyScore(data: {
 
 export async function POST(request: NextRequest) {
   try {
-    const { opportunity_id, keyword } = await request.json();
+    // Check for API key first
+    if (!YOUTUBE_API_KEY) {
+      return NextResponse.json(
+        { error: 'YouTube API key not configured', details: 'YOUTUBE_API_KEY environment variable is missing' },
+        { status: 500 }
+      );
+    }
+
+    const body = await request.json();
+    const { opportunity_id, keyword } = body;
 
     if (!opportunity_id && !keyword) {
       return NextResponse.json(
