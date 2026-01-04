@@ -1,49 +1,29 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import { FadeIn } from '@/components/motion';
 import { Card } from '@/components/ui/card';
 import { OpportunityCard } from '@/components/dashboard';
-import { Bookmark, Loader2 } from 'lucide-react';
+import { Bookmark } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
 import type { Opportunity } from '@/types/database';
 
-export default function WatchlistPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [watchlist, setWatchlist] = useState<Opportunity[]>([]);
+async function getWatchlist(): Promise<Opportunity[]> {
+  const supabase = await createClient();
 
-  useEffect(() => {
-    // Simulate loading - will be replaced with actual API call
-    const loadWatchlist = async () => {
-      await new Promise(resolve => setTimeout(resolve, 500));
+  const { data, error } = await supabase
+    .from('opportunities')
+    .select('*')
+    .eq('is_watched', true)
+    .order('gap_score', { ascending: false });
 
-      // Mock watched items
-      setWatchlist([
-        {
-          id: 'w1',
-          topic_id: 't1',
-          calculated_at: new Date().toISOString(),
-          external_momentum: 72,
-          youtube_supply: 35,
-          gap_score: 73,
-          phase: 'growth',
-          confidence: 'medium',
-          is_watched: true,
-          notes: 'Tracking for next video idea',
-          big_channel_entered: false,
-          big_channel_entered_at: null,
-          keyword: 'Obsidian PKM Workflows',
-          category: 'productivity',
-          sources: ['reddit', 'google_trends'],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ]);
+  if (error) {
+    console.error('Error fetching watchlist:', error);
+    return [];
+  }
 
-      setIsLoading(false);
-    };
+  return data || [];
+}
 
-    loadWatchlist();
-  }, []);
+export default async function WatchlistPage() {
+  const watchlist = await getWatchlist();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -54,11 +34,7 @@ export default function WatchlistPage() {
         </div>
       </FadeIn>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
-        </div>
-      ) : watchlist.length > 0 ? (
+      {watchlist.length > 0 ? (
         <FadeIn delay={0.1}>
           <div className="space-y-4">
             {watchlist.map((opportunity, index) => (

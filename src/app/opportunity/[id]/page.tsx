@@ -7,58 +7,102 @@ import { YouTubeResults } from '@/components/opportunity/youtube-results';
 import { SourceLinks } from '@/components/opportunity/source-links';
 import { ArrowLeft, Bookmark, TrendingUp, Eye, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 
-// Mock data - will be replaced with API call
-const mockOpportunity = {
-  id: '1',
-  topic_id: 't1',
-  keyword: 'Local LLM Fine-tuning',
-  category: 'tech',
-  phase: 'emergence' as const,
-  confidence: 'high' as const,
-  gap_score: 87,
-  external_momentum: 85,
-  youtube_supply: 23,
-  is_watched: false,
-  sources: ['reddit', 'hackernews'],
-  created_at: new Date().toISOString(),
-  calculated_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  notes: null,
-  big_channel_entered: false,
-  big_channel_entered_at: null,
-};
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
 
-const mockSignals = [
-  { date: '2024-01-01', momentum: 45 },
-  { date: '2024-01-02', momentum: 52 },
-  { date: '2024-01-03', momentum: 58 },
-  { date: '2024-01-04', momentum: 63 },
-  { date: '2024-01-05', momentum: 71 },
-  { date: '2024-01-06', momentum: 78 },
-  { date: '2024-01-07', momentum: 85 },
-];
+async function getOpportunityData(id: string) {
+  const supabase = await createClient();
 
-const mockSources = [
-  { id: '1', source: 'reddit', source_title: 'Best tools for local LLM fine-tuning in 2024?', source_url: 'https://reddit.com/r/LocalLLaMA/...', detected_at: '2024-01-05' },
-  { id: '2', source: 'hackernews', source_title: 'Show HN: Fine-tune LLMs on consumer hardware', source_url: 'https://news.ycombinator.com/...', detected_at: '2024-01-06' },
-];
+  // Get opportunity
+  const { data: opportunity, error } = await supabase
+    .from('opportunities')
+    .select('*')
+    .eq('id', id)
+    .single();
 
-const mockYouTube = {
-  total_results: 1250,
-  results_last_7_days: 12,
-  results_last_30_days: 45,
-  avg_channel_subscribers: 15000,
-  large_channel_count: 2,
-  small_channel_count: 8,
-  top_results: [
-    { video_id: 'abc123', title: 'Complete Guide to Fine-tuning Local LLMs', channel_name: 'AI Explained', channel_subscribers: 125000, views: 45000, published_at: '2024-01-02' },
-    { video_id: 'def456', title: 'Fine-tune Mistral 7B on Your Own Data', channel_name: 'Code Monkey', channel_subscribers: 8500, views: 12000, published_at: '2024-01-04' },
-  ],
-};
+  if (error || !opportunity) {
+    return null;
+  }
 
-export default function OpportunityPage() {
-  const opportunity = mockOpportunity;
+  // Get topic sources
+  const { data: sources } = await supabase
+    .from('topic_sources')
+    .select('*')
+    .eq('topic_id', opportunity.topic_id)
+    .order('detected_at', { ascending: false })
+    .limit(10);
+
+  // Get topic signals for trend chart
+  const { data: signals } = await supabase
+    .from('topic_signals')
+    .select('recorded_at, momentum_score')
+    .eq('topic_id', opportunity.topic_id)
+    .order('recorded_at', { ascending: true })
+    .limit(30);
+
+  // Get YouTube supply data
+  const { data: youtubeSupply } = await supabase
+    .from('youtube_supply')
+    .select('*')
+    .eq('topic_id', opportunity.topic_id)
+    .order('checked_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  return {
+    opportunity,
+    sources: sources || [],
+    signals: signals || [],
+    youtubeSupply,
+  };
+}
+
+export default async function OpportunityPage({ params }: PageProps) {
+  const { id } = await params;
+  const data = await getOpportunityData(id);
+
+  if (!data) {
+    notFound();
+  }
+
+  const { opportunity, sources, signals, youtubeSupply } = data;
+
+  // Format signals for chart
+  const chartData = signals.map((s) => ({
+    date: new Date(s.recorded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    momentum: s.momentum_score || 0,
+  }));
+
+  // Format sources for display
+  const formattedSources = sources.map((s) => ({
+    id: s.id,
+    source: s.source,
+    source_title: s.source_title,
+    source_url: s.source_url,
+    detected_at: new Date(s.detected_at).toLocaleDateString(),
+  }));
+
+  // Format YouTube data
+  const youtubeData = youtubeSupply ? {
+    total_results: youtubeSupply.total_results || 0,
+    results_last_7_days: youtubeSupply.results_last_7_days || 0,
+    results_last_30_days: youtubeSupply.results_last_30_days || 0,
+    avg_channel_subscribers: youtubeSupply.avg_channel_subscribers || 0,
+    large_channel_count: youtubeSupply.large_channel_count || 0,
+    small_channel_count: youtubeSupply.small_channel_count || 0,
+    top_results: (youtubeSupply.top_results || []).slice(0, 5).map((v: Record<string, unknown>) => ({
+      video_id: v.video_id,
+      title: v.title,
+      channel_name: 'Channel',
+      channel_subscribers: v.subs,
+      views: v.views,
+      published_at: `${v.age_days} days ago`,
+    })),
+  } : null;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -81,12 +125,12 @@ export default function OpportunityPage() {
                   </div>
                   <div className="flex items-center gap-4 text-sm text-slate-400">
                     <span className="capitalize">{opportunity.category}</span>
-                    <SourceIcons sources={opportunity.sources} />
+                    <SourceIcons sources={opportunity.sources || []} />
                   </div>
                 </div>
                 <Button variant="outline" size="sm" className="gap-2">
                   <Bookmark className="h-4 w-4" />
-                  Watch
+                  {opportunity.is_watched ? 'Watching' : 'Watch'}
                 </Button>
               </div>
 
@@ -97,14 +141,14 @@ export default function OpportunityPage() {
                 <div className="rounded-lg bg-slate-800/50 p-4 text-center">
                   <div className="flex items-center justify-center gap-2 text-2xl font-bold text-emerald-400">
                     <TrendingUp className="h-6 w-6" />
-                    {opportunity.external_momentum}
+                    {Math.round(opportunity.external_momentum)}
                   </div>
                   <span className="text-xs text-slate-500">Momentum</span>
                 </div>
                 <div className="rounded-lg bg-slate-800/50 p-4 text-center">
                   <div className="flex items-center justify-center gap-2 text-2xl font-bold text-blue-400">
                     <Eye className="h-6 w-6" />
-                    {opportunity.youtube_supply}
+                    {Math.round(opportunity.youtube_supply)}
                   </div>
                   <span className="text-xs text-slate-500">YT Supply</span>
                 </div>
@@ -122,14 +166,22 @@ export default function OpportunityPage() {
           <SlideIn direction="up" delay={0.1}>
             <Card className="border-slate-800/50 bg-slate-900/50 p-6">
               <h2 className="text-lg font-semibold text-white mb-4">Momentum Trend</h2>
-              <TrendChart data={mockSignals} />
+              {chartData.length > 0 ? (
+                <TrendChart data={chartData} />
+              ) : (
+                <p className="text-slate-400 text-center py-8">No trend data available yet</p>
+              )}
             </Card>
           </SlideIn>
 
           <SlideIn direction="up" delay={0.2}>
             <Card className="border-slate-800/50 bg-slate-900/50 p-6">
               <h2 className="text-lg font-semibold text-white mb-4">YouTube Landscape</h2>
-              <YouTubeResults data={mockYouTube} />
+              {youtubeData ? (
+                <YouTubeResults data={youtubeData} />
+              ) : (
+                <p className="text-slate-400 text-center py-8">YouTube data not yet available</p>
+              )}
             </Card>
           </SlideIn>
         </div>
@@ -138,7 +190,11 @@ export default function OpportunityPage() {
           <SlideIn direction="right" delay={0.1}>
             <Card className="border-slate-800/50 bg-slate-900/50 p-6">
               <h2 className="text-lg font-semibold text-white mb-4">Source Signals</h2>
-              <SourceLinks sources={mockSources} />
+              {formattedSources.length > 0 ? (
+                <SourceLinks sources={formattedSources} />
+              ) : (
+                <p className="text-slate-400 text-center py-4">No source links available</p>
+              )}
             </Card>
           </SlideIn>
         </div>

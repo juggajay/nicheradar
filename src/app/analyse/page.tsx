@@ -5,39 +5,56 @@ import { FadeIn } from '@/components/motion';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { GapScore, PhaseBadge } from '@/components/dashboard';
-import { Search, Loader2, TrendingUp, Eye, Bookmark } from 'lucide-react';
+import { GapScore, PhaseBadge, SourceIcons } from '@/components/dashboard';
+import { Search, Loader2, TrendingUp, Eye, Bookmark, ExternalLink, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+
+interface AnalysisResult {
+  keyword: string;
+  gap_score: number;
+  momentum: number;
+  supply: number;
+  phase: 'innovation' | 'emergence' | 'growth' | 'maturity' | 'saturated';
+  confidence: 'high' | 'medium' | 'low';
+  sources: string[];
+  existing: boolean;
+  opportunity_id?: string;
+  topic_id?: string;
+  message?: string;
+}
 
 export default function AnalysePage() {
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<null | {
-    keyword: string;
-    gap_score: number;
-    momentum: number;
-    supply: number;
-    phase: 'innovation' | 'emergence' | 'growth' | 'maturity' | 'saturated';
-    confidence: 'high' | 'medium' | 'low';
-  }>(null);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleAnalyse = async () => {
     if (!keyword.trim()) return;
 
     setIsLoading(true);
+    setError(null);
+    setResult(null);
 
-    // Simulate analysis - will be replaced with actual API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      const response = await fetch('/api/analyse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ keyword: keyword.trim() }),
+      });
 
-    setResult({
-      keyword: keyword,
-      gap_score: Math.floor(Math.random() * 40) + 50,
-      momentum: Math.floor(Math.random() * 30) + 60,
-      supply: Math.floor(Math.random() * 40) + 20,
-      phase: ['emergence', 'growth', 'innovation'][Math.floor(Math.random() * 3)] as 'emergence',
-      confidence: ['high', 'medium'][Math.floor(Math.random() * 2)] as 'high',
-    });
+      if (!response.ok) {
+        throw new Error('Analysis failed');
+      }
 
-    setIsLoading(false);
+      const data = await response.json();
+      setResult(data);
+    } catch (err) {
+      setError('Failed to analyse keyword. Please try again.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -81,6 +98,17 @@ export default function AnalysePage() {
         </Card>
       </FadeIn>
 
+      {error && (
+        <FadeIn>
+          <Card className="border-red-800/50 bg-red-900/20 p-4 mb-8">
+            <div className="flex items-center gap-2 text-red-400">
+              <AlertCircle className="h-5 w-5" />
+              {error}
+            </div>
+          </Card>
+        </FadeIn>
+      )}
+
       {result && (
         <FadeIn>
           <Card className="border-slate-800/50 bg-slate-900/50 p-6">
@@ -90,13 +118,33 @@ export default function AnalysePage() {
                   <h2 className="text-xl font-bold text-white">{result.keyword}</h2>
                   <PhaseBadge phase={result.phase} />
                 </div>
-                <p className="text-sm text-slate-400">Analysis complete</p>
+                <div className="flex items-center gap-4 text-sm text-slate-400">
+                  <span className="capitalize">{result.confidence} confidence</span>
+                  {result.sources.length > 0 && <SourceIcons sources={result.sources} />}
+                </div>
               </div>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Bookmark className="h-4 w-4" />
-                Add to Watchlist
-              </Button>
+              <div className="flex gap-2">
+                {result.opportunity_id && (
+                  <Link href={`/opportunity/${result.opportunity_id}`}>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <ExternalLink className="h-4 w-4" />
+                      View Details
+                    </Button>
+                  </Link>
+                )}
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Bookmark className="h-4 w-4" />
+                  Add to Watchlist
+                </Button>
+              </div>
             </div>
+
+            {result.message && (
+              <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 text-sm text-amber-400 mb-6">
+                <AlertCircle className="h-4 w-4" />
+                {result.message}
+              </div>
+            )}
 
             <div className="grid grid-cols-3 gap-4">
               <div className="rounded-lg bg-slate-800/50 p-4 text-center">
@@ -105,28 +153,41 @@ export default function AnalysePage() {
               <div className="rounded-lg bg-slate-800/50 p-4 text-center">
                 <div className="flex items-center justify-center gap-2 text-2xl font-bold text-emerald-400">
                   <TrendingUp className="h-6 w-6" />
-                  {result.momentum}
+                  {Math.round(result.momentum)}
                 </div>
                 <span className="text-xs text-slate-500">Momentum</span>
               </div>
               <div className="rounded-lg bg-slate-800/50 p-4 text-center">
                 <div className="flex items-center justify-center gap-2 text-2xl font-bold text-blue-400">
                   <Eye className="h-6 w-6" />
-                  {result.supply}
+                  {Math.round(result.supply)}
                 </div>
                 <span className="text-xs text-slate-500">YT Supply</span>
               </div>
             </div>
+
+            {result.existing && (
+              <div className="mt-4 pt-4 border-t border-slate-800">
+                <p className="text-sm text-slate-400">
+                  This keyword is already being tracked by NicheRadar.{' '}
+                  {result.opportunity_id && (
+                    <Link href={`/opportunity/${result.opportunity_id}`} className="text-violet-400 hover:text-violet-300">
+                      View full analysis
+                    </Link>
+                  )}
+                </p>
+              </div>
+            )}
           </Card>
         </FadeIn>
       )}
 
-      {!result && !isLoading && (
+      {!result && !isLoading && !error && (
         <FadeIn delay={0.2}>
           <div className="text-center py-16">
             <Search className="h-16 w-16 mx-auto text-slate-700 mb-4" />
             <h3 className="text-lg font-medium text-slate-400 mb-2">Enter a keyword to get started</h3>
-            <p className="text-sm text-slate-500">We'll analyse YouTube competition and external momentum</p>
+            <p className="text-sm text-slate-500">We'll check if it's being tracked and show its opportunity score</p>
           </div>
         </FadeIn>
       )}
